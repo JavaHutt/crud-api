@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/JavaHutt/crud-api/internal/migrate"
@@ -25,7 +24,6 @@ func main() {
 	rep := repository.NewAdvertiseRepo(db)
 	adSvc := service.NewAdvertiseService(rep)
 	fakerSvc := service.NewFakerService()
-	fmt.Println(fakerSvc.Fake(2))
-	srv := server.NewServer("crud-api", ":3000", adSvc)
+	srv := server.NewServer("crud-api", ":3000", adSvc, fakerSvc)
 	log.Fatal(srv.Start())
 }

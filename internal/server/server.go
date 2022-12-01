@@ -5,12 +5,13 @@ import (
 )
 
 type server struct {
-	app   *fiber.App
-	port  string
-	adSvc advertiseService
+	app      *fiber.App
+	port     string
+	adSvc    advertiseService
+	fakerSvc fakerService
 }
 
-func NewServer(name string, port string, adSvc advertiseService) server {
+func NewServer(name string, port string, adSvc advertiseService, fakerSvc fakerService) server {
 	app := fiber.New(fiber.Config{
 		AppName:      name,
 		ServerHeader: "Fiber",
@@ -20,9 +21,10 @@ func NewServer(name string, port string, adSvc advertiseService) server {
 	})
 
 	return server{
-		app:   app,
-		port:  port,
-		adSvc: adSvc,
+		app:      app,
+		port:     port,
+		adSvc:    adSvc,
+		fakerSvc: fakerSvc,
 	}
 }
 
@@ -37,6 +39,6 @@ func (s server) Shutdown() error {
 
 func (s *server) setupRoutes() {
 	v1 := s.app.Group("/api/v1")
-	ads := v1.Group("/advertise")
-	ads.Route("/", newAdvertiseHandler(s.adSvc).Routes)
+	v1.Route("/advertise", newAdvertiseHandler(s.adSvc).Routes)
+	v1.Route("/fake", newFakerHandler(s.fakerSvc, s.adSvc).Routes)
 }
