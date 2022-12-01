@@ -1,0 +1,18 @@
+version: '3.6'
+services:
+  postgres:
+    container_name: crud-api
+    environment:
+      POSTGRES_DB: crud
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    volumes:
+      - ../test/pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
+    external: true
+    name:
+      crud-api
