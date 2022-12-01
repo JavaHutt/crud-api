@@ -7,24 +7,20 @@ import (
 
 	"github.com/JavaHutt/crud-api/internal/repository"
 
-	"github.com/uptrace/bun"
+	"github.com/JavaHutt/crud-api/internal/migrate"
 )
 
 func main() {
-	ctx := context.Background()
 	db, err := repository.NewPostgresDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
-	var num []int
-	err = db.NewRaw(
-		"SELECT id FROM ? LIMIT ?",
-		bun.Ident("test_table"), 100,
-	).Scan(ctx, &num)
 
-	if err != nil {
+	ctx := context.Background()
+	if err = migrate.Migrate(ctx, db); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(num)
+	rep := repository.NewAdvertiseRepo(db)
+	fmt.Println(rep.GetAllAdvertise(ctx))
 }
