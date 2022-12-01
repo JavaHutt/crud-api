@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/JavaHutt/crud-api/internal/repository"
-
 	"github.com/JavaHutt/crud-api/internal/migrate"
+	"github.com/JavaHutt/crud-api/internal/repository"
+	"github.com/JavaHutt/crud-api/internal/service"
 )
 
 func main() {
@@ -22,5 +22,7 @@ func main() {
 		log.Fatal(err)
 	}
 	rep := repository.NewAdvertiseRepo(db)
-	fmt.Println(rep.GetAllAdvertise(ctx))
+	_ = rep
+	fakerSvc := service.NewFakerService()
+	fmt.Println(fakerSvc.Fake(2))
 }
