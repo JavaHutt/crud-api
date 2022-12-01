@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/JavaHutt/crud-api/internal/model"
 )
@@ -27,25 +28,46 @@ func NewAdvertiseService(rep advertiseRepository) advertiseService {
 }
 
 func (svc advertiseService) GetAll(ctx context.Context) ([]model.Advertise, error) {
-	return svc.rep.GetAll(ctx)
+	ads, err := svc.rep.GetAll(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all advertise: %w", err)
+	}
+	return ads, nil
+
 }
 
 func (svc advertiseService) Get(ctx context.Context, id int) (*model.Advertise, error) {
-	return svc.rep.Get(ctx, id)
+	ad, err := svc.rep.Get(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get advertise: %w", err)
+	}
+	return ad, nil
 }
 
 func (svc advertiseService) Insert(ctx context.Context, ad model.Advertise) error {
-	return svc.rep.Insert(ctx, ad)
+	if err := svc.rep.Insert(ctx, ad); err != nil {
+		return fmt.Errorf("failed to insert advertise: %w", err)
+	}
+	return nil
 }
 
 func (svc advertiseService) InsertBulk(ctx context.Context, ads []model.Advertise) error {
-	return svc.rep.InsertBulk(ctx, ads)
+	if err := svc.rep.InsertBulk(ctx, ads); err != nil {
+		return fmt.Errorf("failed to insert bulk advertise: %w", err)
+	}
+	return nil
 }
 
 func (svc advertiseService) Update(ctx context.Context, ad model.Advertise) error {
-	return svc.rep.Update(ctx, ad)
+	if err := svc.rep.Update(ctx, ad); err != nil {
+		return fmt.Errorf("failed to update advertise: %w", err)
+	}
+	return nil
 }
 
 func (svc advertiseService) Delete(ctx context.Context, id int) error {
-	return svc.rep.Delete(ctx, id)
+	if err := svc.rep.Delete(ctx, id); err != nil {
+		return fmt.Errorf("failed to delete advertise: %w", err)
+	}
+	return nil
 }

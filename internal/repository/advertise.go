@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/JavaHutt/crud-api/internal/model"
 	"github.com/uptrace/bun"
@@ -31,6 +33,9 @@ func (rep advertiseRepo) GetAll(ctx context.Context) ([]model.Advertise, error) 
 func (rep advertiseRepo) Get(ctx context.Context, id int) (*model.Advertise, error) {
 	var ad model.Advertise
 	if err := rep.db.NewSelect().Model(&ad).Where("id = ?", id).Scan(ctx); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model.ErrNotFound
+		}
 		return nil, err
 	}
 	return &ad, nil
@@ -51,11 +56,20 @@ func (rep advertiseRepo) InsertBulk(ctx context.Context, ads []model.Advertise) 
 // Update updates an advertise by it's ID
 func (rep advertiseRepo) Update(ctx context.Context, advertise model.Advertise) error {
 	_, err := rep.db.NewUpdate().Model(advertise).WherePK().Exec(ctx)
+	if errors.Is(err, sql.ErrNoRows) {
+		return model.ErrNotFound
+	}
 	return err
 }
 
 // Delete deletes an advertise row by it's ID
 func (rep advertiseRepo) Delete(ctx context.Context, id int) error {
 	_, err := rep.db.NewDelete().Where("id = ?", id).Exec(ctx)
-	return err
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return model.ErrNotFound
+		}
+		return err
+	}
+	return nil
 }

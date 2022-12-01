@@ -5,10 +5,15 @@ import (
 	"log"
 
 	"github.com/JavaHutt/crud-api/internal/migrate"
+	"github.com/JavaHutt/crud-api/internal/model"
 	"github.com/JavaHutt/crud-api/internal/repository"
 	"github.com/JavaHutt/crud-api/internal/server"
 	"github.com/JavaHutt/crud-api/internal/service"
 )
+
+func init() {
+	model.RegisterValidators()
+}
 
 func main() {
 	db, err := repository.NewPostgresDB()

@@ -3,9 +3,11 @@ package server
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/JavaHutt/crud-api/internal/model"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -33,13 +35,15 @@ func newAdvertiseHandler(svc advertiseService) advertiseHandler {
 func (h advertiseHandler) Routes(router fiber.Router) {
 	router.Get("/", h.getAll)
 	router.Get("/:id", h.get)
+	router.Post("/", h.create)
 }
 
 func (h advertiseHandler) getAll(c *fiber.Ctx) error {
 	res, err := h.svc.GetAll(c.Context())
 	if err != nil {
-		return err
+		return encodeError(err)
 	}
+
 	return c.JSON(res)
 }
 
@@ -52,7 +56,21 @@ func (h advertiseHandler) get(c *fiber.Ctx) error {
 
 	res, err := h.svc.Get(c.Context(), id)
 	if err != nil {
-		return err
+		return encodeError(err)
 	}
+
 	return c.JSON(res)
+}
+
+func (h advertiseHandler) create(c *fiber.Ctx) error {
+	ad := new(model.Advertise)
+	if err := c.BodyParser(ad); err != nil {
+		return badRequest(fmt.Sprintf("failed to decode body: %s", err.Error()))
+	}
+	log.Fatal(ad)
+	if err := h.svc.Insert(c.Context(), *ad); err != nil {
+		return encodeError(err)
+	}
+
+	return c.SendStatus(fiber.StatusCreated)
 }
