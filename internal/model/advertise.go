@@ -26,13 +26,13 @@ const (
 type Advertise struct {
 	bun.BaseModel `bun:"table:advertise,alias:a"`
 
-	ID        int64         `bun:"id,pk,autoincrement"`
-	Name      string        `bun:",notnull"`
-	Kind      AdvertiseKind `bun:",notnull"`
-	Provider  string        `bun:",notnull"`
-	Country   string        `bun:",notnull"`
-	City      string        `bun:",notnull"`
-	Street    string
-	CreatedAt time.Time `bun:",nullzero,notnull,default:current_timestamp"`
-	UpdatedAt time.Time `bun:",nullzero,notnull,default:current_timestamp"`
+	ID        int64         `json:"id",bun:"id,pk,autoincrement"`
+	Name      string        `json:"name",bun:",notnull"`
+	Kind      AdvertiseKind `json:"kind",bun:",notnull"`
+	Provider  string        `json:"provider",bun:",notnull"`
+	Country   string        `json:"country",bun:",notnull"`
+	City      string        `json:"city"mbun:",notnull"`
+	Street    string        `json:"street"`
+	CreatedAt time.Time     `json:"created_at",bun:",nullzero,notnull,default:current_timestamp"`
+	UpdatedAt time.Time     `json:"updated_at",bun:",nullzero,notnull,default:current_timestamp"`
 }
