@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/JavaHutt/crud-api/config"
 	"github.com/JavaHutt/crud-api/internal/migrate"
 	"github.com/JavaHutt/crud-api/internal/model"
 	"github.com/JavaHutt/crud-api/internal/repository"
@@ -16,11 +17,16 @@ func init() {
 }
 
 func main() {
+	config, err := config.New()
+	if err != nil {
+		log.Fatal(err)
+	}
 	db, err := repository.NewPostgresDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
+
 	redis, err := repository.NewRedis()
 	if err != nil {
 		log.Fatal(err)
@@ -31,10 +37,11 @@ func main() {
 	if err = migrate.Migrate(ctx, db); err != nil {
 		log.Fatal(err)
 	}
+
 	rep := repository.NewAdvertiseRepo(db)
 	cache := repository.NewCache(redis)
 	adSvc := service.NewAdvertiseService(rep, cache)
 	fakerSvc := service.NewFakerService()
-	srv := server.NewServer("crud-api", ":3000", adSvc, fakerSvc)
+	srv := server.NewServer(config, adSvc, fakerSvc)
 	log.Fatal(srv.Start())
 }

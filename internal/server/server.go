@@ -1,8 +1,18 @@
 package server
 
 import (
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 )
+
+type config interface {
+	AppName() string
+	APIAddress() string
+	IdleTimeout() time.Duration
+	ReadTimeout() time.Duration
+	WriteTimeout() time.Duration
+}
 
 type server struct {
 	app      *fiber.App
@@ -11,18 +21,18 @@ type server struct {
 	fakerSvc fakerService
 }
 
-func NewServer(name string, port string, adSvc advertiseService, fakerSvc fakerService) server {
+func NewServer(cfg config, adSvc advertiseService, fakerSvc fakerService) server {
 	app := fiber.New(fiber.Config{
-		AppName:      name,
+		AppName:      cfg.AppName(),
 		ServerHeader: "Fiber",
-		// IdleTimeout: 0,
-		// ReadTimeout: 0,
-		// WriteTimeout: 0,
+		IdleTimeout:  cfg.IdleTimeout(),
+		ReadTimeout:  cfg.ReadTimeout(),
+		WriteTimeout: cfg.WriteTimeout(),
 	})
 
 	return server{
 		app:      app,
-		port:     port,
+		port:     cfg.APIAddress(),
 		adSvc:    adSvc,
 		fakerSvc: fakerSvc,
 	}
