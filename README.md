@@ -39,3 +39,7 @@ To stop the containers:
 ```bash
 make down
 ```
+
+## Proof of work
+
+<img src="./assets/working-example.png">
