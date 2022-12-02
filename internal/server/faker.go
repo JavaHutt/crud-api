@@ -10,6 +10,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+const defaultNum = 100
+
 type fakerService interface {
 	Fake(num int) []model.Advertise
 }
@@ -36,7 +38,7 @@ func (h fakerHandler) Routes(router fiber.Router) {
 }
 
 func (h fakerHandler) fake(c *fiber.Ctx) error {
-	numQuery := c.Query("num", "100")
+	numQuery := c.Query("num", strconv.Itoa(defaultNum))
 	num, err := strconv.Atoi(numQuery)
 	if err != nil {
 		return badRequest(fmt.Sprintf("invalid number query param: %s", numQuery))

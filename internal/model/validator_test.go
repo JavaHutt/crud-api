@@ -4,7 +4,15 @@ import (
 	"testing"
 )
 
-func TestAdvertiseValidate(t *testing.T) {
+const (
+	name     = "banner"
+	provider = "outbrain"
+	country  = "Switzerland"
+	city     = "Bern"
+	street   = "Kramgasse"
+)
+
+func TestValidateAdvertise(t *testing.T) {
 	RegisterValidators()
 	type fields struct {
 		ID       int64
@@ -28,100 +36,99 @@ func TestAdvertiseValidate(t *testing.T) {
 			name: "no name",
 			fields: fields{
 				Kind:     AdvertiseKindBannerStretch,
-				Provider: "outbrain",
-				Country:  "Switzerland",
-				City:     "Bern",
-				Street:   "Kramgasse",
+				Provider: provider,
+				Country:  country,
+				City:     city,
+				Street:   street,
 			},
 			wantErr: true,
 		},
 		{
 			name: "no kind",
 			fields: fields{
-				Name:     "Banner",
-				Provider: "outbrain",
-				Country:  "Switzerland",
-				City:     "Bern",
-				Street:   "Kramgasse",
+				Name:     name,
+				Provider: provider,
+				Country:  country,
+				City:     city,
+				Street:   street,
 			},
 			wantErr: true,
 		},
 		{
 			name: "unknown kind",
 			fields: fields{
-				Name:     "Banner",
+				Name:     name,
 				Kind:     "prebid",
-				Provider: "outbrain",
-				Country:  "Switzerland",
-				City:     "Bern",
-				Street:   "Kramgasse",
+				Provider: provider,
+				Country:  country,
+				City:     city,
+				Street:   street,
 			},
 			wantErr: true,
 		},
 		{
 			name: "no provider",
 			fields: fields{
-				Name:    "Banner",
+				Name:    name,
 				Kind:    AdvertiseKindAeroman,
-				Country: "Switzerland",
-				City:    "Bern",
-				Street:  "Kramgasse",
+				Country: country,
+				City:    city,
+				Street:  street,
 			},
 			wantErr: true,
 		},
 		{
 			name: "no country",
 			fields: fields{
-				Name:     "Banner",
+				Name:     name,
 				Kind:     AdvertiseKindAeroman,
-				Provider: "outbrain",
-				City:     "Bern",
-				Street:   "Kramgasse",
+				Provider: provider,
+				City:     city,
+				Street:   street,
 			},
 			wantErr: true,
 		},
 		{
 			name: "no city",
 			fields: fields{
-				Name:     "Banner",
+				Name:     name,
 				Kind:     AdvertiseKindAeroman,
-				Provider: "outbrain",
-				Country:  "Switzerland",
-				Street:   "Kramgasse",
+				Provider: provider,
+				Country:  country,
+				Street:   street,
 			},
 			wantErr: true,
 		},
 		{
 			name: "no street",
 			fields: fields{
-				Name:     "Banner",
+				Name:     name,
 				Kind:     AdvertiseKindAeroman,
-				Provider: "outbrain",
-				Country:  "Switzerland",
-				City:     "Bern",
+				Provider: provider,
+				Country:  country,
+				City:     city,
 			},
 			wantErr: true,
 		},
 		{
 			name: "no street with transition kind",
 			fields: fields{
-				Name:     "Banner",
+				Name:     name,
 				Kind:     AdvertiseKindTransition,
-				Provider: "outbrain",
-				Country:  "Switzerland",
-				City:     "Bern",
+				Provider: provider,
+				Country:  country,
+				City:     city,
 			},
-			wantErr: true,
 		},
 		{
 			name: "success",
 			fields: fields{
-				Name:     "Banner",
+				Name:     name,
 				Kind:     AdvertiseKindAeroman,
-				Provider: "outbrain",
-				Country:  "Switzerland",
-				City:     "Bern",
-				Street:   "Kramgasse",
+				Provider: provider,
+				Country:  country,
+				City:     city,
+				Street:   street,
 			},
 		},
 	}

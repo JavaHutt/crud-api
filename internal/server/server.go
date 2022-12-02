@@ -40,5 +40,5 @@ func (s server) Shutdown() error {
 func (s *server) setupRoutes() {
 	v1 := s.app.Group("/api/v1")
 	v1.Route("/advertise", newAdvertiseHandler(s.adSvc).Routes)
-	v1.Route("/fake", newFakerHandler(s.fakerSvc, s.adSvc).Routes)
+	v1.Route("/faker", newFakerHandler(s.fakerSvc, s.adSvc).Routes)
 }
