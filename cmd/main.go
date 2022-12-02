@@ -21,6 +21,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	db, err := repository.NewPostgresDB(config)
 	if err != nil {
 		log.Fatal(err)
@@ -39,7 +40,7 @@ func main() {
 	}
 
 	rep := repository.NewAdvertiseRepo(db)
-	cache := repository.NewCache(redis)
+	cache := repository.NewCache(redis, repository.WithExpiration(config.CacheExpiration()))
 	adSvc := service.NewAdvertiseService(rep, cache)
 	fakerSvc := service.NewFakerService()
 	srv := server.NewServer(config, adSvc, fakerSvc)

@@ -22,7 +22,9 @@ func migrateTables(ctx context.Context, migrator *migrate.Migrator) error {
 	if err := migrator.Lock(ctx); err != nil {
 		return err
 	}
-	defer migrator.Unlock(ctx)
+	defer func() {
+		_ = migrator.Unlock(ctx)
+	}()
 
 	group, err := migrator.Migrate(ctx)
 	if err != nil {

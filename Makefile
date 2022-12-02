@@ -13,3 +13,6 @@ down	:
 
 volume	:
 	docker volume create --name=crud-api
+
+lint	:
+	golangci-lint run --timeout 5m0s

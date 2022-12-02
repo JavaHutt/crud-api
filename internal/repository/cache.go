@@ -12,18 +12,27 @@ import (
 	"github.com/go-redis/redis/v9"
 )
 
-const defaultExpiration = 25
+const defaultExpiration = 25 * time.Second
 
-type cache struct {
-	client *redis.Client
-	exp    time.Duration
-}
+type (
+	Option func(c *cache)
+	cache  struct {
+		client *redis.Client
+		exp    time.Duration
+	}
+)
 
-func NewCache(client *redis.Client) cache {
-	return cache{
+func NewCache(client *redis.Client, options ...Option) cache {
+	c := cache{
 		client: client,
 		exp:    defaultExpiration,
 	}
+
+	for _, opt := range options {
+		opt(&c)
+	}
+
+	return c
 }
 
 func (c cache) Get(ctx context.Context, id string) (*model.Advertise, error) {
@@ -50,5 +59,11 @@ func (c cache) Set(ctx context.Context, ad model.Advertise) error {
 		return err
 	}
 
-	return c.client.Set(ctx, strconv.Itoa(int(ad.ID)), b.Bytes(), c.exp*time.Second).Err()
+	return c.client.Set(ctx, strconv.Itoa(int(ad.ID)), b.Bytes(), c.exp).Err()
+}
+
+func WithExpiration(exp time.Duration) Option {
+	return func(c *cache) {
+		c.exp = exp
+	}
 }

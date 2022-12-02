@@ -5,7 +5,7 @@ import "github.com/go-playground/validator/v10"
 var Validate = validator.New()
 
 func RegisterValidators() {
-	Validate.RegisterValidation("kindenum", validateKind)
+	_ = Validate.RegisterValidation("kindenum", validateKind)
 }
 
 func validateKind(fl validator.FieldLevel) bool {
