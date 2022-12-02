@@ -27,7 +27,7 @@ func main() {
 	}
 	defer db.Close()
 
-	redis, err := repository.NewRedis()
+	redis, err := repository.NewRedis(config)
 	if err != nil {
 		log.Fatal(err)
 	}

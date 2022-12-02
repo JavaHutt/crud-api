@@ -23,6 +23,11 @@ type Config interface {
 	PostgresName() string
 	PostgresUser() string
 	PostgresPassword() string
+	RedisHost() string
+	RedisPort() string
+	RedisDB() int
+	CacheTimeout() time.Duration
+	CacheExpiration() time.Duration
 }
 
 type configData struct {
@@ -36,6 +41,11 @@ type configData struct {
 	PostgresName_     string        `mapstructure:"PG_NAME"`
 	PostgresUser_     string        `mapstructure:"PG_USER"`
 	PostgresPassword_ string        `mapstructure:"PG_PASSWORD"`
+	RedisHost_        string        `mapstructure:"REDIS_HOST"`
+	RedisPort_        string        `mapstructure:"REDIS_PORT"`
+	RedisDB_          int           `mapstructure:"REDIS_DB"`
+	CacheTimeout_     time.Duration `mapstructure:"CACHE_TIMEOUT"`
+	CacheExpiration_  time.Duration `mapstructure:"CACHE_EXPIRATION"`
 }
 
 func New() (Config, error) {
@@ -72,6 +82,11 @@ func setDefaults() {
 	viper.SetDefault("POSTGRES_NAME", "crud")
 	viper.SetDefault("POSTGRES_USER", "postgres")
 	viper.SetDefault("POSTGRES_PASSWORD", "postgres")
+	viper.SetDefault("REDIS_HOST", "localhost")
+	viper.SetDefault("REDIS_PORT", "6379")
+	viper.SetDefault("REDIS_DB", 0)
+	viper.SetDefault("CACHE_TIMEOUT", 100)
+	viper.SetDefault("CACHE_EXPIRATION", 25)
 }
 
 func loadConfigToViper(path string) error {
@@ -119,4 +134,24 @@ func (cfg *configData) PostgresUser() string {
 
 func (cfg *configData) PostgresPassword() string {
 	return cfg.PostgresPassword_
+}
+
+func (cfg *configData) RedisHost() string {
+	return cfg.RedisHost_
+}
+
+func (cfg *configData) RedisPort() string {
+	return cfg.RedisPort_
+}
+
+func (cfg *configData) RedisDB() int {
+	return cfg.RedisDB_
+}
+
+func (cfg *configData) CacheTimeout() time.Duration {
+	return time.Duration(cfg.CacheTimeout_) * time.Millisecond
+}
+
+func (cfg *configData) CacheExpiration() time.Duration {
+	return time.Duration(cfg.CacheExpiration_) * time.Second
 }

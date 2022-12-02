@@ -2,17 +2,25 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v9"
 )
 
-func NewRedis() (*redis.Client, error) {
+type redisConfig interface {
+	RedisHost() string
+	RedisPort() string
+	RedisDB() int
+	CacheTimeout() time.Duration
+}
+
+func NewRedis(cfg redisConfig) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr:        "localhost:6379",
-		DB:          0,
-		DialTimeout: 100 * time.Millisecond,
-		ReadTimeout: 100 * time.Millisecond,
+		Addr:        fmt.Sprintf("%s:%s", cfg.RedisHost(), cfg.RedisPort()),
+		DB:          cfg.RedisDB(),
+		DialTimeout: cfg.CacheTimeout(),
+		ReadTimeout: cfg.CacheTimeout(),
 	})
 
 	if _, err := client.Ping(context.Background()).Result(); err != nil {
