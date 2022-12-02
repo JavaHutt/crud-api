@@ -170,6 +170,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestCreate(t *testing.T) {
+	model.RegisterValidators()
 	type serviceMockData struct {
 		ad model.Advertise
 
@@ -184,10 +185,19 @@ func TestCreate(t *testing.T) {
 	}{
 		{
 			name: "storage error",
+			ad:   advertise,
 			serviceMock: &serviceMockData{
+				ad:  advertise,
 				err: model.ErrStorage,
 			},
 			status: http.StatusInternalServerError,
+		},
+		{
+			name: "bad advertise object",
+			ad: model.Advertise{
+				City: "Berlin",
+			},
+			status: http.StatusBadRequest,
 		},
 		{
 			name: "success",
@@ -216,6 +226,132 @@ func TestCreate(t *testing.T) {
 			require.NoError(t, err)
 			req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(body))
 			req.Header.Add("Content-Type", "application/json")
+			resp, err := app.Test(req)
+			require.Equal(t, tc.status, resp.StatusCode)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	type serviceMockData struct {
+		ad model.Advertise
+
+		err error
+	}
+	testsCases := []struct {
+		name        string
+		id          int
+		ad          model.Advertise
+		serviceMock *serviceMockData
+
+		status int
+	}{
+		{
+			name: "storage error",
+			serviceMock: &serviceMockData{
+				err: model.ErrStorage,
+			},
+			status: http.StatusInternalServerError,
+		},
+		{
+			name: "not found",
+			serviceMock: &serviceMockData{
+				err: model.ErrNotFound,
+			},
+			status: http.StatusNotFound,
+		},
+		{
+			name: "success",
+			id:   1,
+			ad:   advertise,
+			serviceMock: &serviceMockData{
+				ad: advertise,
+			},
+			status: http.StatusNoContent,
+		},
+	}
+	for _, tc := range testsCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctl := gomock.NewController(t)
+			mockSvc := mocks.NewMockadvertiseService(ctl)
+
+			if tc.serviceMock != nil {
+				mockSvc.EXPECT().
+					Update(gomock.Any(), tc.serviceMock.ad).
+					Return(tc.serviceMock.err).
+					Times(1)
+			}
+			app := fiber.New()
+			handler := newAdvertiseHandler(mockSvc)
+			app.Put("/:id", handler.update)
+			body, err := json.Marshal(tc.ad)
+			require.NoError(t, err)
+			req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/%d", tc.id), bytes.NewBuffer(body))
+			req.Header.Add("Content-Type", "application/json")
+			resp, err := app.Test(req)
+			require.Equal(t, tc.status, resp.StatusCode)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestDelete(t *testing.T) {
+	type serviceMockData struct {
+		id int
+
+		err error
+	}
+	testsCases := []struct {
+		name        string
+		id          int
+		serviceMock *serviceMockData
+
+		status int
+	}{
+		{
+			name: "storage error",
+			id:   1,
+			serviceMock: &serviceMockData{
+				id:  1,
+				err: model.ErrStorage,
+			},
+			status: http.StatusInternalServerError,
+		},
+		{
+			name: "not found",
+			id:   90,
+			serviceMock: &serviceMockData{
+				id:  90,
+				err: model.ErrNotFound,
+			},
+			status: http.StatusNotFound,
+		},
+		{
+			name: "success",
+			id:   1,
+			serviceMock: &serviceMockData{
+				id: 1,
+			},
+			status: http.StatusNoContent,
+		},
+	}
+	for _, tc := range testsCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctl := gomock.NewController(t)
+			mockSvc := mocks.NewMockadvertiseService(ctl)
+
+			if tc.serviceMock != nil {
+				mockSvc.EXPECT().
+					Delete(gomock.Any(), tc.serviceMock.id).
+					Return(tc.serviceMock.err).
+					Times(1)
+			}
+			app := fiber.New()
+			handler := newAdvertiseHandler(mockSvc)
+			app.Delete("/:id", handler.delete)
+
+			req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/%d", tc.id), nil)
 			resp, err := app.Test(req)
 			require.Equal(t, tc.status, resp.StatusCode)
 			require.NoError(t, err)

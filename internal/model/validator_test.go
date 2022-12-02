@@ -143,7 +143,7 @@ func TestValidateAdvertise(t *testing.T) {
 				City:     tc.fields.City,
 				Street:   tc.fields.Street,
 			}
-			if err := validate.Struct(a); (err != nil) != tc.wantErr {
+			if err := Validate.Struct(a); (err != nil) != tc.wantErr {
 				t.Errorf("Advertise.Validate() error = %v, wantErr %v", err, tc.wantErr)
 			}
 		})

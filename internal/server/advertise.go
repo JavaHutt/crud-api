@@ -69,6 +69,10 @@ func (h advertiseHandler) create(c *fiber.Ctx) error {
 		return badRequest(fmt.Sprintf("failed to decode body: %s", err.Error()))
 	}
 
+	if err := model.Validate.Struct(ad); err != nil {
+		return badRequest(err.Error())
+	}
+
 	if err := h.svc.Insert(c.Context(), *ad); err != nil {
 		return encodeError(err)
 	}

@@ -2,10 +2,10 @@ package model
 
 import "github.com/go-playground/validator/v10"
 
-var validate = validator.New()
+var Validate = validator.New()
 
 func RegisterValidators() {
-	validate.RegisterValidation("kindenum", validateKind)
+	Validate.RegisterValidation("kindenum", validateKind)
 }
 
 func validateKind(fl validator.FieldLevel) bool {
