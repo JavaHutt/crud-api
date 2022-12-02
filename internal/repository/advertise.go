@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/JavaHutt/crud-api/internal/model"
 
@@ -65,7 +66,10 @@ func (rep advertiseRepo) InsertBulk(ctx context.Context, ads []model.Advertise) 
 
 // Update updates an advertise by it's ID
 func (rep advertiseRepo) Update(ctx context.Context, advertise model.Advertise) error {
-	_, err := rep.db.NewUpdate().Model(&advertise).OmitZero().WherePK().Exec(ctx)
+	advertise.UpdatedAt = time.Now().UTC()
+	_, err := rep.db.NewUpdate().Model(&advertise).
+		ExcludeColumn("created_at").
+		OmitZero().WherePK().Exec(ctx)
 	if errors.Is(err, sql.ErrNoRows) {
 		return model.ErrNotFound
 	}

@@ -3,7 +3,7 @@ run	:
 	go run cmd/main.go
 
 test	:
-	go test -cover ./...
+	CGO_ENABLED=1 go test -race -cover -count=1 -coverprofile=./test/.coverprofile ./internal/...
 
 up	:
 	docker-compose -f deployments/docker-compose.yaml up -d
