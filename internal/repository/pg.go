@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/uptrace/bun"
@@ -9,19 +10,31 @@ import (
 	"github.com/uptrace/bun/driver/pgdriver"
 )
 
-func NewPostgresDB() (*bun.DB, error) {
+type config interface {
+	AppName() string
+	PostgresHost() string
+	PostgresPort() string
+	PostgresName() string
+	PostgresUser() string
+	PostgresPassword() string
+	IdleTimeout() time.Duration
+	ReadTimeout() time.Duration
+	WriteTimeout() time.Duration
+}
+
+func NewPostgresDB(cfg config) (*bun.DB, error) {
 	pgconn := pgdriver.NewConnector(
 		pgdriver.WithNetwork("tcp"),
-		pgdriver.WithAddr("localhost:5432"),
+		pgdriver.WithAddr(fmt.Sprintf("%s:%s", cfg.PostgresHost(), cfg.PostgresPort())),
 		pgdriver.WithTLSConfig(nil),
-		pgdriver.WithUser("postgres"),
-		pgdriver.WithPassword("postgres"),
-		pgdriver.WithDatabase("crud"),
-		pgdriver.WithApplicationName("crud-api"),
-		pgdriver.WithTimeout(5*time.Second),
-		pgdriver.WithDialTimeout(5*time.Second),
-		pgdriver.WithReadTimeout(5*time.Second),
-		pgdriver.WithWriteTimeout(5*time.Second),
+		pgdriver.WithApplicationName(cfg.AppName()),
+		pgdriver.WithDatabase(cfg.PostgresName()),
+		pgdriver.WithUser(cfg.PostgresUser()),
+		pgdriver.WithPassword(cfg.PostgresPassword()),
+		pgdriver.WithTimeout(cfg.IdleTimeout()),
+		pgdriver.WithDialTimeout(cfg.IdleTimeout()),
+		pgdriver.WithReadTimeout(cfg.ReadTimeout()),
+		pgdriver.WithWriteTimeout(cfg.WriteTimeout()),
 	)
 
 	sqldb := sql.OpenDB(pgconn)

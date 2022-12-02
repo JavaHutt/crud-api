@@ -18,14 +18,24 @@ type Config interface {
 	IdleTimeout() time.Duration
 	ReadTimeout() time.Duration
 	WriteTimeout() time.Duration
+	PostgresHost() string
+	PostgresPort() string
+	PostgresName() string
+	PostgresUser() string
+	PostgresPassword() string
 }
 
 type configData struct {
-	AppName_      string        `mapstructure:"APP_NAME"`
-	APIAddress_   string        `mapstructure:"API_ADDRESS"`
-	IdleTimeout_  time.Duration `mapstructure:"IDLE_TIMEOUT"`
-	ReadTimeout_  time.Duration `mapstructure:"READ_TIMEOUT"`
-	WriteTimeout_ time.Duration `mapstructure:"WRITE_TIMEOUT"`
+	AppName_          string        `mapstructure:"APP_NAME"`
+	APIAddress_       string        `mapstructure:"API_ADDRESS"`
+	IdleTimeout_      time.Duration `mapstructure:"IDLE_TIMEOUT"`
+	ReadTimeout_      time.Duration `mapstructure:"READ_TIMEOUT"`
+	WriteTimeout_     time.Duration `mapstructure:"WRITE_TIMEOUT"`
+	PostgresHost_     string        `mapstructure:"PG_HOST"`
+	PostgresPort_     string        `mapstructure:"PG_PORT"`
+	PostgresName_     string        `mapstructure:"PG_NAME"`
+	PostgresUser_     string        `mapstructure:"PG_USER"`
+	PostgresPassword_ string        `mapstructure:"PG_PASSWORD"`
 }
 
 func New() (Config, error) {
@@ -54,9 +64,14 @@ func configureViper() (*configData, error) {
 func setDefaults() {
 	viper.SetDefault("APP_NAME", "crud-api")
 	viper.SetDefault("API_ADDRESS", ":3000")
-	viper.SetDefault("IDLE_TIMEOUT", 5)
-	viper.SetDefault("READ_TIMEOUT", 5)
-	viper.SetDefault("WRITE_TIMEOUT", 5)
+	viper.SetDefault("IDLE_TIMEOUT", 1)
+	viper.SetDefault("READ_TIMEOUT", 1)
+	viper.SetDefault("WRITE_TIMEOUT", 1)
+	viper.SetDefault("POSTGRES_HOST", "localhost")
+	viper.SetDefault("POSTGRES_PORT", "5432")
+	viper.SetDefault("POSTGRES_NAME", "crud")
+	viper.SetDefault("POSTGRES_USER", "postgres")
+	viper.SetDefault("POSTGRES_PASSWORD", "postgres")
 }
 
 func loadConfigToViper(path string) error {
@@ -84,4 +99,24 @@ func (cfg *configData) ReadTimeout() time.Duration {
 
 func (cfg *configData) WriteTimeout() time.Duration {
 	return time.Duration(cfg.WriteTimeout_) * time.Minute
+}
+
+func (cfg *configData) PostgresHost() string {
+	return cfg.PostgresHost_
+}
+
+func (cfg *configData) PostgresPort() string {
+	return cfg.PostgresPort_
+}
+
+func (cfg *configData) PostgresName() string {
+	return cfg.PostgresName_
+}
+
+func (cfg *configData) PostgresUser() string {
+	return cfg.PostgresUser_
+}
+
+func (cfg *configData) PostgresPassword() string {
+	return cfg.PostgresPassword_
 }

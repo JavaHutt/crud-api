@@ -21,7 +21,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	db, err := repository.NewPostgresDB()
+	db, err := repository.NewPostgresDB(config)
 	if err != nil {
 		log.Fatal(err)
 	}
