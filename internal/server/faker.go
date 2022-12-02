@@ -35,7 +35,6 @@ func newFakerHandler(svc fakerService, adSvc adsService) fakerHandler {
 
 func (h fakerHandler) Routes(router fiber.Router) {
 	router.Get("/", h.fake)
-
 }
 
 func (h fakerHandler) fake(c *fiber.Ctx) error {

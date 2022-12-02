@@ -111,6 +111,9 @@ func TestGetAll(t *testing.T) {
 
 			req := httptest.NewRequest(http.MethodGet, target, nil)
 			resp, err := app.Test(req)
+			defer func() {
+				_ = resp.Body.Close()
+			}()
 			require.Equal(t, tc.status, resp.StatusCode)
 			require.NoError(t, err)
 			if tc.want != nil {
@@ -185,6 +188,9 @@ func TestGet(t *testing.T) {
 
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%d", tc.id), nil)
 			resp, err := app.Test(req)
+			defer func() {
+				_ = resp.Body.Close()
+			}()
 			require.Equal(t, tc.status, resp.StatusCode)
 			require.NoError(t, err)
 			if tc.want != nil {
@@ -256,6 +262,9 @@ func TestCreate(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(body))
 			req.Header.Add("Content-Type", "application/json")
 			resp, err := app.Test(req)
+			defer func() {
+				_ = resp.Body.Close()
+			}()
 			require.Equal(t, tc.status, resp.StatusCode)
 			require.NoError(t, err)
 		})
@@ -319,6 +328,9 @@ func TestUpdate(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/%d", tc.id), bytes.NewBuffer(body))
 			req.Header.Add("Content-Type", "application/json")
 			resp, err := app.Test(req)
+			defer func() {
+				_ = resp.Body.Close()
+			}()
 			require.Equal(t, tc.status, resp.StatusCode)
 			require.NoError(t, err)
 		})
@@ -382,6 +394,9 @@ func TestDelete(t *testing.T) {
 
 			req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/%d", tc.id), nil)
 			resp, err := app.Test(req)
+			defer func() {
+				_ = resp.Body.Close()
+			}()
 			require.Equal(t, tc.status, resp.StatusCode)
 			require.NoError(t, err)
 		})

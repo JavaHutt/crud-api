@@ -43,7 +43,6 @@ func (svc advertiseService) GetAll(ctx context.Context, page int, order string) 
 		return nil, fmt.Errorf("failed to get all advertise: %w", err)
 	}
 	return ads, nil
-
 }
 
 // Get selects single ad by it's ID

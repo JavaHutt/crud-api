@@ -30,22 +30,23 @@ type Config interface {
 	CacheExpiration() time.Duration
 }
 
+//nolint:revive
 type configData struct {
-	AppName_          string        `mapstructure:"APP_NAME"`
-	APIAddress_       string        `mapstructure:"API_ADDRESS"`
-	IdleTimeout_      time.Duration `mapstructure:"IDLE_TIMEOUT"`
-	ReadTimeout_      time.Duration `mapstructure:"READ_TIMEOUT"`
-	WriteTimeout_     time.Duration `mapstructure:"WRITE_TIMEOUT"`
-	PostgresHost_     string        `mapstructure:"PG_HOST"`
-	PostgresPort_     string        `mapstructure:"PG_PORT"`
-	PostgresName_     string        `mapstructure:"PG_NAME"`
-	PostgresUser_     string        `mapstructure:"PG_USER"`
-	PostgresPassword_ string        `mapstructure:"PG_PASSWORD"`
-	RedisHost_        string        `mapstructure:"REDIS_HOST"`
-	RedisPort_        string        `mapstructure:"REDIS_PORT"`
-	RedisDB_          int           `mapstructure:"REDIS_DB"`
-	CacheTimeout_     time.Duration `mapstructure:"CACHE_TIMEOUT"`
-	CacheExpiration_  time.Duration `mapstructure:"CACHE_EXPIRATION"`
+	AppName_          string `mapstructure:"APP_NAME"`
+	APIAddress_       string `mapstructure:"API_ADDRESS"`
+	IdleTimeout_      int    `mapstructure:"IDLE_TIMEOUT"`
+	ReadTimeout_      int    `mapstructure:"READ_TIMEOUT"`
+	WriteTimeout_     int    `mapstructure:"WRITE_TIMEOUT"`
+	PostgresHost_     string `mapstructure:"PG_HOST"`
+	PostgresPort_     string `mapstructure:"PG_PORT"`
+	PostgresName_     string `mapstructure:"PG_NAME"`
+	PostgresUser_     string `mapstructure:"PG_USER"`
+	PostgresPassword_ string `mapstructure:"PG_PASSWORD"`
+	RedisHost_        string `mapstructure:"REDIS_HOST"`
+	RedisPort_        string `mapstructure:"REDIS_PORT"`
+	RedisDB_          int    `mapstructure:"REDIS_DB"`
+	CacheTimeout_     int    `mapstructure:"CACHE_TIMEOUT"`
+	CacheExpiration_  int    `mapstructure:"CACHE_EXPIRATION"`
 }
 
 func New() (Config, error) {

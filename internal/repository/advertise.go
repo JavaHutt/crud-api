@@ -51,7 +51,7 @@ func (rep advertiseRepo) Get(ctx context.Context, id int) (*model.Advertise, err
 }
 
 // Insert creates a single advertise row
-// if the ID is passed and conflict occures, npthing happends
+// if the ID is passed and conflict occures, npthing happens
 func (rep advertiseRepo) Insert(ctx context.Context, advertise model.Advertise) error {
 	_, err := rep.db.NewInsert().Model(&advertise).Ignore().Exec(ctx)
 	return err

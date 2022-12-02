@@ -71,6 +71,9 @@ func TestFake(t *testing.T) {
 
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/?num=%d", tc.num), nil)
 			resp, err := app.Test(req)
+			defer func() {
+				_ = resp.Body.Close()
+			}()
 			require.Equal(t, tc.status, resp.StatusCode)
 			require.NoError(t, err)
 		})

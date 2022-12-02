@@ -30,13 +30,13 @@ func main() {
 
 	redis, err := repository.NewRedis(config)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 	defer redis.Close()
 
 	ctx := context.Background()
 	if err = migrate.Migrate(ctx, db); err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	rep := repository.NewAdvertiseRepo(db)
@@ -44,5 +44,5 @@ func main() {
 	adSvc := service.NewAdvertiseService(rep, cache)
 	fakerSvc := service.NewFakerService()
 	srv := server.NewServer(config, adSvc, fakerSvc)
-	log.Fatal(srv.Start())
+	log.Panic(srv.Start())
 }
