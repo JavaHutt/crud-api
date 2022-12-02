@@ -34,11 +34,16 @@ var (
 
 func TestGetAll(t *testing.T) {
 	type repositoryMockData struct {
+		page int
+		sort string
+
 		ads []model.Advertise
 		err error
 	}
 	testsCases := []struct {
 		name           string
+		page           int
+		sort           string
 		repositoryMock *repositoryMockData
 
 		want []model.Advertise
@@ -46,14 +51,24 @@ func TestGetAll(t *testing.T) {
 	}{
 		{
 			name: "storage error",
+			page: 1,
+			sort: "asc",
 			repositoryMock: &repositoryMockData{
+				page: 1,
+				sort: "asc",
+
 				err: model.ErrStorage,
 			},
 			err: model.ErrStorage,
 		},
 		{
 			name: "success",
+			page: 1,
+			sort: "asc",
 			repositoryMock: &repositoryMockData{
+				page: 1,
+				sort: "asc",
+
 				ads: []model.Advertise{advertise, anotherAdvertise},
 			},
 			want: []model.Advertise{advertise, anotherAdvertise},
@@ -65,12 +80,12 @@ func TestGetAll(t *testing.T) {
 			mockRepo := mocks.NewMockadvertiseRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
-					GetAll(context.Background(), "").
+					GetAll(context.Background(), 0, "").
 					Return(tc.repositoryMock.ads, tc.repositoryMock.err).
 					Times(1)
 			}
 			svc := NewAdvertiseService(mockRepo)
-			actual, err := svc.GetAll(context.Background(), "")
+			actual, err := svc.GetAll(context.Background(), 0, "")
 
 			if tc.err != nil {
 				require.Nil(t, actual)

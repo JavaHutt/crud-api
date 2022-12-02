@@ -14,10 +14,11 @@ import (
 const (
 	idParam   = "id"
 	sortQuery = "sort"
+	pageQuery = "page"
 )
 
 type advertiseService interface {
-	GetAll(ctx context.Context, order string) ([]model.Advertise, error)
+	GetAll(ctx context.Context, page int, order string) ([]model.Advertise, error)
 	Get(ctx context.Context, id int) (*model.Advertise, error)
 	Insert(ctx context.Context, advertise model.Advertise) error
 	InsertBulk(ctx context.Context, ads []model.Advertise) error
@@ -48,7 +49,11 @@ func (h advertiseHandler) getAll(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	res, err := h.svc.GetAll(c.Context(), sort)
+	page, err := getPageQuery(c)
+	if err != nil {
+		return err
+	}
+	res, err := h.svc.GetAll(c.Context(), page, sort)
 	if err != nil {
 		return encodeError(err)
 	}
@@ -137,4 +142,13 @@ func getSortQuery(c *fiber.Ctx) (string, error) {
 		return "", badRequest(fmt.Sprintf("bad sort query param: %s", sort))
 	}
 	return sort, nil
+}
+
+func getPageQuery(c *fiber.Ctx) (int, error) {
+	pageStr := c.Query(pageQuery, "0")
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		return 0, badRequest(fmt.Sprintf("invalid page param: %s", pageStr))
+	}
+	return page, nil
 }

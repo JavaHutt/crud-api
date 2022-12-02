@@ -9,7 +9,7 @@ import (
 )
 
 type advertiseRepository interface {
-	GetAll(ctx context.Context, order string) ([]model.Advertise, error)
+	GetAll(ctx context.Context, page int, order string) ([]model.Advertise, error)
 	Get(ctx context.Context, id int) (*model.Advertise, error)
 	Insert(ctx context.Context, advertise model.Advertise) error
 	InsertBulk(ctx context.Context, ads []model.Advertise) error
@@ -29,8 +29,8 @@ func NewAdvertiseService(rep advertiseRepository) advertiseService {
 }
 
 // GetAll selects all the advertises
-func (svc advertiseService) GetAll(ctx context.Context, order string) ([]model.Advertise, error) {
-	ads, err := svc.rep.GetAll(ctx, order)
+func (svc advertiseService) GetAll(ctx context.Context, page int, order string) ([]model.Advertise, error) {
+	ads, err := svc.rep.GetAll(ctx, page, order)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all advertise: %w", err)
 	}

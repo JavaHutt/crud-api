@@ -11,6 +11,8 @@ import (
 	"github.com/uptrace/bun"
 )
 
+const perPage = 10
+
 type advertiseRepo struct {
 	db *bun.DB
 }
@@ -23,14 +25,14 @@ func NewAdvertiseRepo(db *bun.DB) advertiseRepo {
 }
 
 // GetAll selects all the advertises
-func (rep advertiseRepo) GetAll(ctx context.Context, sort string) ([]model.Advertise, error) {
+func (rep advertiseRepo) GetAll(ctx context.Context, page int, sort string) ([]model.Advertise, error) {
 	order := "id ASC"
 	if sort != "" {
 		order = fmt.Sprintf("created_at %s, %s", sort, order)
 	}
-	fmt.Println(order)
 	var ads []model.Advertise
-	if err := rep.db.NewSelect().Model(&ads).OrderExpr(order).Scan(ctx); err != nil {
+	if err := rep.db.NewSelect().Model(&ads).OrderExpr(order).
+		Limit(perPage).Offset((page - 1) * perPage).Scan(ctx); err != nil {
 		return nil, err
 	}
 	return ads, nil
