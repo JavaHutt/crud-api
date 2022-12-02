@@ -37,6 +37,12 @@ func (h fakerHandler) Routes(router fiber.Router) {
 	router.Get("/", h.fake)
 }
 
+// fake godoc
+// @Summary Fake Advertise entities
+// @Tags    faker
+// @Param   num query int false "number of ads to generate"
+// @success 200
+// @Router  /fake [get]
 func (h fakerHandler) fake(c *fiber.Ctx) error {
 	numQuery := c.Query("num", strconv.Itoa(defaultNum))
 	num, err := strconv.Atoi(numQuery)

@@ -44,6 +44,15 @@ func (h advertiseHandler) Routes(router fiber.Router) {
 	router.Delete("/:id", h.delete)
 }
 
+// getAll godoc
+// @Summary Gets all Advertise entities
+// @Tags    advertise
+// @Produce json
+// @Param   sort query    string false "asc,desc"
+// @Param   page query    int    false "page number, e.g. 2"
+// @Success 200  {object} []model.Advertise
+// @Failure 500
+// @Router  /api/v1/advertise [get]
 func (h advertiseHandler) getAll(c *fiber.Ctx) error {
 	sort, err := getSortQuery(c)
 	if err != nil {
@@ -61,6 +70,14 @@ func (h advertiseHandler) getAll(c *fiber.Ctx) error {
 	return c.JSON(res)
 }
 
+// get godoc
+// @Summary Get single Advertise entity
+// @Tags    advertise
+// @Produce json
+// @Param   id  path     int true "id of the ad"
+// @Success 200 {object} model.Advertise
+// @Failure 500
+// @Router  /api/v1/advertise [get]
 func (h advertiseHandler) get(c *fiber.Ctx) error {
 	id, err := getIDParam(c)
 	if err != nil {
@@ -75,6 +92,13 @@ func (h advertiseHandler) get(c *fiber.Ctx) error {
 	return c.JSON(res)
 }
 
+// create godoc
+// @Summary Creates a single Advertise entity
+// @Tags    advertise
+// @Accept  json
+// @Success 201
+// @Failure 500
+// @Router  /api/v1/advertise [post]
 func (h advertiseHandler) create(c *fiber.Ctx) error {
 	ad := new(model.Advertise)
 	if err := c.BodyParser(ad); err != nil {
@@ -92,6 +116,13 @@ func (h advertiseHandler) create(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusCreated)
 }
 
+// update godoc
+// @Summary Update single Advertise entity
+// @Tags    advertise
+// @Param   id path int true "id of the ad"
+// @Success 204
+// @Failure 500
+// @Router  /api/v1/advertise [put]
 func (h advertiseHandler) update(c *fiber.Ctx) error {
 	id, err := getIDParam(c)
 	if err != nil {
@@ -111,6 +142,13 @@ func (h advertiseHandler) update(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
+// delete godoc
+// @Summary Delete single Advertise entity
+// @Tags    advertise
+// @Param   id path int true "id of the ad"
+// @Success 204
+// @Failure 500
+// @Router  /api/v1/advertise [delete]
 func (h advertiseHandler) delete(c *fiber.Ctx) error {
 	id, err := getIDParam(c)
 	if err != nil {

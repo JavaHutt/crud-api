@@ -1,0 +1,106 @@
+definitions:
+  model.Advertise:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      kind:
+        type: string
+      name:
+        type: string
+      provider:
+        type: string
+      street:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - city
+    - country
+    - kind
+    - name
+    - provider
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/advertise:
+    delete:
+      parameters:
+      - description: id of the ad
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+      summary: Delete single Advertise entity
+      tags:
+      - advertise
+    get:
+      parameters:
+      - description: id of the ad
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Advertise'
+        "500":
+          description: Internal Server Error
+      summary: Get single Advertise entity
+      tags:
+      - advertise
+    post:
+      consumes:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "500":
+          description: Internal Server Error
+      summary: Creates a single Advertise entity
+      tags:
+      - advertise
+    put:
+      parameters:
+      - description: id of the ad
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+      summary: Update single Advertise entity
+      tags:
+      - advertise
+  /fake:
+    get:
+      parameters:
+      - description: number of ads to generate
+        in: query
+        name: num
+        type: integer
+      responses:
+        "200":
+          description: OK
+      summary: Fake Advertise entities
+      tags:
+      - faker
+swagger: "2.0"
