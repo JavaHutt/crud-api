@@ -1,3 +1,4 @@
+//go:generate mockgen -source advertise.go -destination=./mocks/mocks.go -package=mocks
 package service
 
 import (
@@ -7,7 +8,7 @@ import (
 	"github.com/JavaHutt/crud-api/internal/model"
 )
 
-type advertiseRepository interface {
+type AdvertiseRepository interface {
 	GetAll(ctx context.Context) ([]model.Advertise, error)
 	Get(ctx context.Context, id int) (*model.Advertise, error)
 	Insert(ctx context.Context, advertise model.Advertise) error
@@ -17,11 +18,11 @@ type advertiseRepository interface {
 }
 
 type advertiseService struct {
-	rep advertiseRepository
+	rep AdvertiseRepository
 }
 
 // NewAdvertiseService is a constructor for advertise service
-func NewAdvertiseService(rep advertiseRepository) advertiseService {
+func NewAdvertiseService(rep AdvertiseRepository) advertiseService {
 	return advertiseService{
 		rep: rep,
 	}
