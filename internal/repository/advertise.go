@@ -42,20 +42,21 @@ func (rep advertiseRepo) Get(ctx context.Context, id int) (*model.Advertise, err
 }
 
 // Insert creates a single advertise row
+// if the ID is passed and conflict occures, npthing happends
 func (rep advertiseRepo) Insert(ctx context.Context, advertise model.Advertise) error {
-	_, err := rep.db.NewInsert().Model(advertise).Exec(ctx)
+	_, err := rep.db.NewInsert().Model(&advertise).Ignore().Exec(ctx)
 	return err
 }
 
 // InsertBulk creates a multiple advertise rows
 func (rep advertiseRepo) InsertBulk(ctx context.Context, ads []model.Advertise) error {
-	_, err := rep.db.NewInsert().Model(&ads).Exec(ctx)
+	_, err := rep.db.NewInsert().Model(&ads).Ignore().Exec(ctx)
 	return err
 }
 
 // Update updates an advertise by it's ID
 func (rep advertiseRepo) Update(ctx context.Context, advertise model.Advertise) error {
-	_, err := rep.db.NewUpdate().Model(advertise).WherePK().Exec(ctx)
+	_, err := rep.db.NewUpdate().Model(&advertise).OmitZero().WherePK().Exec(ctx)
 	if errors.Is(err, sql.ErrNoRows) {
 		return model.ErrNotFound
 	}

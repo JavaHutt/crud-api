@@ -1,4 +1,3 @@
-//go:generate mockgen -source advertise.go -destination=./mocks/mocks.go -package=mocks
 package service
 
 import (
@@ -6,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/JavaHutt/crud-api/internal/model"
-	"github.com/stretchr/testify/require"
-
 	"github.com/JavaHutt/crud-api/internal/service/mocks"
+
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -63,7 +62,7 @@ func TestGetAll(t *testing.T) {
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockAdvertiseRepository(ctl)
+			mockRepo := mocks.NewMockadvertiseRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
 					GetAll(context.Background()).
@@ -120,7 +119,7 @@ func TestGet(t *testing.T) {
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockAdvertiseRepository(ctl)
+			mockRepo := mocks.NewMockadvertiseRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
 					Get(context.Background(), tc.repositoryMock.id).
@@ -173,7 +172,7 @@ func TestInsert(t *testing.T) {
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockAdvertiseRepository(ctl)
+			mockRepo := mocks.NewMockadvertiseRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
 					Insert(context.Background(), tc.repositoryMock.ad).
@@ -223,7 +222,7 @@ func TestInsertBulk(t *testing.T) {
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockAdvertiseRepository(ctl)
+			mockRepo := mocks.NewMockadvertiseRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
 					InsertBulk(context.Background(), tc.repositoryMock.ads).
@@ -273,7 +272,7 @@ func TestUpdate(t *testing.T) {
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockAdvertiseRepository(ctl)
+			mockRepo := mocks.NewMockadvertiseRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
 					Update(context.Background(), tc.repositoryMock.ad).
@@ -323,7 +322,7 @@ func TestDelete(t *testing.T) {
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockAdvertiseRepository(ctl)
+			mockRepo := mocks.NewMockadvertiseRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
 					Delete(context.Background(), tc.repositoryMock.id).

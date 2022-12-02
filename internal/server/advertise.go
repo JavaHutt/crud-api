@@ -1,3 +1,4 @@
+//go:generate mockgen -source advertise.go -destination=./mocks/advertise.go -package=mocks
 package server
 
 import (

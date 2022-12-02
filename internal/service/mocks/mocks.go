@@ -12,31 +12,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockAdvertiseRepository is a mock of AdvertiseRepository interface.
-type MockAdvertiseRepository struct {
+// MockadvertiseRepository is a mock of advertiseRepository interface.
+type MockadvertiseRepository struct {
 	ctrl     *gomock.Controller
-	recorder *MockAdvertiseRepositoryMockRecorder
+	recorder *MockadvertiseRepositoryMockRecorder
 }
 
-// MockAdvertiseRepositoryMockRecorder is the mock recorder for MockAdvertiseRepository.
-type MockAdvertiseRepositoryMockRecorder struct {
-	mock *MockAdvertiseRepository
+// MockadvertiseRepositoryMockRecorder is the mock recorder for MockadvertiseRepository.
+type MockadvertiseRepositoryMockRecorder struct {
+	mock *MockadvertiseRepository
 }
 
-// NewMockAdvertiseRepository creates a new mock instance.
-func NewMockAdvertiseRepository(ctrl *gomock.Controller) *MockAdvertiseRepository {
-	mock := &MockAdvertiseRepository{ctrl: ctrl}
-	mock.recorder = &MockAdvertiseRepositoryMockRecorder{mock}
+// NewMockadvertiseRepository creates a new mock instance.
+func NewMockadvertiseRepository(ctrl *gomock.Controller) *MockadvertiseRepository {
+	mock := &MockadvertiseRepository{ctrl: ctrl}
+	mock.recorder = &MockadvertiseRepositoryMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockAdvertiseRepository) EXPECT() *MockAdvertiseRepositoryMockRecorder {
+func (m *MockadvertiseRepository) EXPECT() *MockadvertiseRepositoryMockRecorder {
 	return m.recorder
 }
 
 // Delete mocks base method.
-func (m *MockAdvertiseRepository) Delete(ctx context.Context, id int) error {
+func (m *MockadvertiseRepository) Delete(ctx context.Context, id int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -44,13 +44,13 @@ func (m *MockAdvertiseRepository) Delete(ctx context.Context, id int) error {
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockAdvertiseRepositoryMockRecorder) Delete(ctx, id interface{}) *gomock.Call {
+func (mr *MockadvertiseRepositoryMockRecorder) Delete(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockAdvertiseRepository)(nil).Delete), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockadvertiseRepository)(nil).Delete), ctx, id)
 }
 
 // Get mocks base method.
-func (m *MockAdvertiseRepository) Get(ctx context.Context, id int) (*model.Advertise, error) {
+func (m *MockadvertiseRepository) Get(ctx context.Context, id int) (*model.Advertise, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", ctx, id)
 	ret0, _ := ret[0].(*model.Advertise)
@@ -59,13 +59,13 @@ func (m *MockAdvertiseRepository) Get(ctx context.Context, id int) (*model.Adver
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockAdvertiseRepositoryMockRecorder) Get(ctx, id interface{}) *gomock.Call {
+func (mr *MockadvertiseRepositoryMockRecorder) Get(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockAdvertiseRepository)(nil).Get), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockadvertiseRepository)(nil).Get), ctx, id)
 }
 
 // GetAll mocks base method.
-func (m *MockAdvertiseRepository) GetAll(ctx context.Context) ([]model.Advertise, error) {
+func (m *MockadvertiseRepository) GetAll(ctx context.Context) ([]model.Advertise, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll", ctx)
 	ret0, _ := ret[0].([]model.Advertise)
@@ -74,13 +74,13 @@ func (m *MockAdvertiseRepository) GetAll(ctx context.Context) ([]model.Advertise
 }
 
 // GetAll indicates an expected call of GetAll.
-func (mr *MockAdvertiseRepositoryMockRecorder) GetAll(ctx interface{}) *gomock.Call {
+func (mr *MockadvertiseRepositoryMockRecorder) GetAll(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockAdvertiseRepository)(nil).GetAll), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockadvertiseRepository)(nil).GetAll), ctx)
 }
 
 // Insert mocks base method.
-func (m *MockAdvertiseRepository) Insert(ctx context.Context, advertise model.Advertise) error {
+func (m *MockadvertiseRepository) Insert(ctx context.Context, advertise model.Advertise) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Insert", ctx, advertise)
 	ret0, _ := ret[0].(error)
@@ -88,13 +88,13 @@ func (m *MockAdvertiseRepository) Insert(ctx context.Context, advertise model.Ad
 }
 
 // Insert indicates an expected call of Insert.
-func (mr *MockAdvertiseRepositoryMockRecorder) Insert(ctx, advertise interface{}) *gomock.Call {
+func (mr *MockadvertiseRepositoryMockRecorder) Insert(ctx, advertise interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockAdvertiseRepository)(nil).Insert), ctx, advertise)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockadvertiseRepository)(nil).Insert), ctx, advertise)
 }
 
 // InsertBulk mocks base method.
-func (m *MockAdvertiseRepository) InsertBulk(ctx context.Context, ads []model.Advertise) error {
+func (m *MockadvertiseRepository) InsertBulk(ctx context.Context, ads []model.Advertise) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertBulk", ctx, ads)
 	ret0, _ := ret[0].(error)
@@ -102,13 +102,13 @@ func (m *MockAdvertiseRepository) InsertBulk(ctx context.Context, ads []model.Ad
 }
 
 // InsertBulk indicates an expected call of InsertBulk.
-func (mr *MockAdvertiseRepositoryMockRecorder) InsertBulk(ctx, ads interface{}) *gomock.Call {
+func (mr *MockadvertiseRepositoryMockRecorder) InsertBulk(ctx, ads interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertBulk", reflect.TypeOf((*MockAdvertiseRepository)(nil).InsertBulk), ctx, ads)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertBulk", reflect.TypeOf((*MockadvertiseRepository)(nil).InsertBulk), ctx, ads)
 }
 
 // Update mocks base method.
-func (m *MockAdvertiseRepository) Update(ctx context.Context, advertise model.Advertise) error {
+func (m *MockadvertiseRepository) Update(ctx context.Context, advertise model.Advertise) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, advertise)
 	ret0, _ := ret[0].(error)
@@ -116,7 +116,7 @@ func (m *MockAdvertiseRepository) Update(ctx context.Context, advertise model.Ad
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockAdvertiseRepositoryMockRecorder) Update(ctx, advertise interface{}) *gomock.Call {
+func (mr *MockadvertiseRepositoryMockRecorder) Update(ctx, advertise interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockAdvertiseRepository)(nil).Update), ctx, advertise)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockadvertiseRepository)(nil).Update), ctx, advertise)
 }

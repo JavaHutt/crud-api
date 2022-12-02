@@ -8,7 +8,7 @@ import (
 	"github.com/JavaHutt/crud-api/internal/model"
 )
 
-type AdvertiseRepository interface {
+type advertiseRepository interface {
 	GetAll(ctx context.Context) ([]model.Advertise, error)
 	Get(ctx context.Context, id int) (*model.Advertise, error)
 	Insert(ctx context.Context, advertise model.Advertise) error
@@ -18,16 +18,17 @@ type AdvertiseRepository interface {
 }
 
 type advertiseService struct {
-	rep AdvertiseRepository
+	rep advertiseRepository
 }
 
 // NewAdvertiseService is a constructor for advertise service
-func NewAdvertiseService(rep AdvertiseRepository) advertiseService {
+func NewAdvertiseService(rep advertiseRepository) advertiseService {
 	return advertiseService{
 		rep: rep,
 	}
 }
 
+// GetAll selects all the advertises
 func (svc advertiseService) GetAll(ctx context.Context) ([]model.Advertise, error) {
 	ads, err := svc.rep.GetAll(ctx)
 	if err != nil {
@@ -37,6 +38,7 @@ func (svc advertiseService) GetAll(ctx context.Context) ([]model.Advertise, erro
 
 }
 
+// Get selects single ad by it's ID
 func (svc advertiseService) Get(ctx context.Context, id int) (*model.Advertise, error) {
 	ad, err := svc.rep.Get(ctx, id)
 	if err != nil {
@@ -45,6 +47,7 @@ func (svc advertiseService) Get(ctx context.Context, id int) (*model.Advertise, 
 	return ad, nil
 }
 
+// Insert creates a single advertise row
 func (svc advertiseService) Insert(ctx context.Context, ad model.Advertise) error {
 	if err := svc.rep.Insert(ctx, ad); err != nil {
 		return fmt.Errorf("failed to insert advertise: %w", err)
@@ -52,6 +55,7 @@ func (svc advertiseService) Insert(ctx context.Context, ad model.Advertise) erro
 	return nil
 }
 
+// InsertBulk creates a multiple advertise rows
 func (svc advertiseService) InsertBulk(ctx context.Context, ads []model.Advertise) error {
 	if err := svc.rep.InsertBulk(ctx, ads); err != nil {
 		return fmt.Errorf("failed to insert bulk advertise: %w", err)
@@ -59,6 +63,7 @@ func (svc advertiseService) InsertBulk(ctx context.Context, ads []model.Advertis
 	return nil
 }
 
+// Update updates an advertise by it's ID
 func (svc advertiseService) Update(ctx context.Context, ad model.Advertise) error {
 	if err := svc.rep.Update(ctx, ad); err != nil {
 		return fmt.Errorf("failed to update advertise: %w", err)
@@ -66,6 +71,7 @@ func (svc advertiseService) Update(ctx context.Context, ad model.Advertise) erro
 	return nil
 }
 
+// Delete deletes an advertise row by it's ID
 func (svc advertiseService) Delete(ctx context.Context, id int) error {
 	if err := svc.rep.Delete(ctx, id); err != nil {
 		return fmt.Errorf("failed to delete advertise: %w", err)
