@@ -65,12 +65,12 @@ func TestGetAll(t *testing.T) {
 			mockRepo := mocks.NewMockadvertiseRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
-					GetAll(context.Background()).
+					GetAll(context.Background(), "").
 					Return(tc.repositoryMock.ads, tc.repositoryMock.err).
 					Times(1)
 			}
 			svc := NewAdvertiseService(mockRepo)
-			actual, err := svc.GetAll(context.Background())
+			actual, err := svc.GetAll(context.Background(), "")
 
 			if tc.err != nil {
 				require.Nil(t, actual)

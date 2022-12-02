@@ -39,27 +39,39 @@ var (
 
 func TestGetAll(t *testing.T) {
 	type serviceMockData struct {
+		sort string
+
 		ads []model.Advertise
 		err error
 	}
 	testsCases := []struct {
 		name        string
+		sort        string
 		serviceMock *serviceMockData
 
 		status int
 		want   []model.Advertise
 	}{
 		{
+			name:   "bad sorting query param",
+			sort:   "esc",
+			status: http.StatusBadRequest,
+		},
+		{
 			name: "storage error",
+			sort: "asc",
 			serviceMock: &serviceMockData{
-				err: model.ErrStorage,
+				sort: "asc",
+				err:  model.ErrStorage,
 			},
 			status: http.StatusInternalServerError,
 		},
 		{
 			name: "success",
+			sort: "asc",
 			serviceMock: &serviceMockData{
-				ads: []model.Advertise{advertise, anotherAdvertise},
+				sort: "asc",
+				ads:  []model.Advertise{advertise, anotherAdvertise},
 			},
 			status: http.StatusOK,
 			want:   []model.Advertise{advertise, anotherAdvertise},
@@ -72,7 +84,7 @@ func TestGetAll(t *testing.T) {
 
 			if tc.serviceMock != nil {
 				mockSvc.EXPECT().
-					GetAll(gomock.Any()).
+					GetAll(gomock.Any(), tc.serviceMock.sort).
 					Return(tc.serviceMock.ads, tc.serviceMock.err).
 					Times(1)
 			}
@@ -80,7 +92,12 @@ func TestGetAll(t *testing.T) {
 			handler := newAdvertiseHandler(mockSvc)
 			app.Get("/", handler.getAll)
 
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			target := "/"
+			if tc.sort != "" {
+				target = fmt.Sprintf("%s?sort=%s", target, tc.sort)
+			}
+
+			req := httptest.NewRequest(http.MethodGet, target, nil)
 			resp, err := app.Test(req)
 			require.Equal(t, tc.status, resp.StatusCode)
 			require.NoError(t, err)

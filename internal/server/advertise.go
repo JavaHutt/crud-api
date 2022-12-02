@@ -11,10 +11,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-const idParam = "id"
+const (
+	idParam   = "id"
+	sortQuery = "sort"
+)
 
 type advertiseService interface {
-	GetAll(ctx context.Context) ([]model.Advertise, error)
+	GetAll(ctx context.Context, order string) ([]model.Advertise, error)
 	Get(ctx context.Context, id int) (*model.Advertise, error)
 	Insert(ctx context.Context, advertise model.Advertise) error
 	InsertBulk(ctx context.Context, ads []model.Advertise) error
@@ -41,7 +44,11 @@ func (h advertiseHandler) Routes(router fiber.Router) {
 }
 
 func (h advertiseHandler) getAll(c *fiber.Ctx) error {
-	res, err := h.svc.GetAll(c.Context())
+	sort, err := getSortQuery(c)
+	if err != nil {
+		return err
+	}
+	res, err := h.svc.GetAll(c.Context(), sort)
 	if err != nil {
 		return encodeError(err)
 	}
@@ -119,4 +126,15 @@ func getIDParam(c *fiber.Ctx) (int, error) {
 		return 0, badRequest(fmt.Sprintf("invalid id param: %s", idStr))
 	}
 	return id, nil
+}
+
+func getSortQuery(c *fiber.Ctx) (string, error) {
+	sort := c.Query(sortQuery)
+	if sort == "" {
+		return "", nil
+	}
+	if sort != "asc" && sort != "desc" {
+		return "", badRequest(fmt.Sprintf("bad sort query param: %s", sort))
+	}
+	return sort, nil
 }

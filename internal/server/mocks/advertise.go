@@ -65,18 +65,18 @@ func (mr *MockadvertiseServiceMockRecorder) Get(ctx, id interface{}) *gomock.Cal
 }
 
 // GetAll mocks base method.
-func (m *MockadvertiseService) GetAll(ctx context.Context) ([]model.Advertise, error) {
+func (m *MockadvertiseService) GetAll(ctx context.Context, order string) ([]model.Advertise, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAll", ctx)
+	ret := m.ctrl.Call(m, "GetAll", ctx, order)
 	ret0, _ := ret[0].([]model.Advertise)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAll indicates an expected call of GetAll.
-func (mr *MockadvertiseServiceMockRecorder) GetAll(ctx interface{}) *gomock.Call {
+func (mr *MockadvertiseServiceMockRecorder) GetAll(ctx, order interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockadvertiseService)(nil).GetAll), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockadvertiseService)(nil).GetAll), ctx, order)
 }
 
 // Insert mocks base method.

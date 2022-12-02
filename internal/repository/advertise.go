@@ -4,8 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/JavaHutt/crud-api/internal/model"
+
 	"github.com/uptrace/bun"
 )
 
@@ -21,9 +23,14 @@ func NewAdvertiseRepo(db *bun.DB) advertiseRepo {
 }
 
 // GetAll selects all the advertises
-func (rep advertiseRepo) GetAll(ctx context.Context) ([]model.Advertise, error) {
+func (rep advertiseRepo) GetAll(ctx context.Context, sort string) ([]model.Advertise, error) {
+	order := "id ASC"
+	if sort != "" {
+		order = fmt.Sprintf("created_at %s, %s", sort, order)
+	}
+	fmt.Println(order)
 	var ads []model.Advertise
-	if err := rep.db.NewSelect().Model(&ads).OrderExpr("id ASC").Scan(ctx); err != nil {
+	if err := rep.db.NewSelect().Model(&ads).OrderExpr(order).Scan(ctx); err != nil {
 		return nil, err
 	}
 	return ads, nil
@@ -65,7 +72,7 @@ func (rep advertiseRepo) Update(ctx context.Context, advertise model.Advertise) 
 
 // Delete deletes an advertise row by it's ID
 func (rep advertiseRepo) Delete(ctx context.Context, id int) error {
-	_, err := rep.db.NewDelete().Where("id = ?", id).Exec(ctx)
+	_, err := rep.db.NewDelete().Model((*model.Advertise)(nil)).Where("id = ?", id).Exec(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return model.ErrNotFound
