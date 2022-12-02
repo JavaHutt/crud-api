@@ -1,3 +1,4 @@
+//go:generate mockgen -source faker.go -destination=./mocks/faker.go -package=mocks
 package server
 
 import (
