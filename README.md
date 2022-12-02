@@ -36,6 +36,13 @@ Start the database and cache server, this project includes PostgreSQL and Redis 
 make up
 ```
 You are ready to test the server!
+```bash
+make start
+```
+If you want to seed database with mock data, you can make specific request or use a following command:
+```bash
+make fake
+```
 To stop the containers:
 ```bash
 make down

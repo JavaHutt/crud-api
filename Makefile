@@ -14,6 +14,9 @@ down	:
 volume	:
 	docker volume create --name=crud-api
 
+fake	:
+	curl --location --request GET 'http://localhost:3000/api/v1/faker?num=50'
+
 lint	:
 	golangci-lint run --timeout 5m0s
 
