@@ -21,13 +21,19 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
+	redis, err := repository.NewRedis()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer redis.Close()
 
 	ctx := context.Background()
 	if err = migrate.Migrate(ctx, db); err != nil {
 		log.Fatal(err)
 	}
 	rep := repository.NewAdvertiseRepo(db)
-	adSvc := service.NewAdvertiseService(rep)
+	cache := repository.NewCache(redis)
+	adSvc := service.NewAdvertiseService(rep, cache)
 	fakerSvc := service.NewFakerService()
 	srv := server.NewServer("crud-api", ":3000", adSvc, fakerSvc)
 	log.Fatal(srv.Start())

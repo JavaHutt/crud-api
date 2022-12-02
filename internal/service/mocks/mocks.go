@@ -120,3 +120,55 @@ func (mr *MockadvertiseRepositoryMockRecorder) Update(ctx, advertise interface{}
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockadvertiseRepository)(nil).Update), ctx, advertise)
 }
+
+// Mockcache is a mock of cache interface.
+type Mockcache struct {
+	ctrl     *gomock.Controller
+	recorder *MockcacheMockRecorder
+}
+
+// MockcacheMockRecorder is the mock recorder for Mockcache.
+type MockcacheMockRecorder struct {
+	mock *Mockcache
+}
+
+// NewMockcache creates a new mock instance.
+func NewMockcache(ctrl *gomock.Controller) *Mockcache {
+	mock := &Mockcache{ctrl: ctrl}
+	mock.recorder = &MockcacheMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *Mockcache) EXPECT() *MockcacheMockRecorder {
+	return m.recorder
+}
+
+// Get mocks base method.
+func (m *Mockcache) Get(ctx context.Context, id string) (*model.Advertise, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", ctx, id)
+	ret0, _ := ret[0].(*model.Advertise)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockcacheMockRecorder) Get(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*Mockcache)(nil).Get), ctx, id)
+}
+
+// Set mocks base method.
+func (m *Mockcache) Set(ctx context.Context, ad model.Advertise) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Set", ctx, ad)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Set indicates an expected call of Set.
+func (mr *MockcacheMockRecorder) Set(ctx, ad interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*Mockcache)(nil).Set), ctx, ad)
+}

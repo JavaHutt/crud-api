@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   postgres:
-    container_name: crud-api
+    container_name: crud-api-db
     environment:
       POSTGRES_DB: crud
       POSTGRES_USER: postgres
@@ -11,6 +11,12 @@ services:
       - 5432:5432
     volumes:
       - ../test/pgdata:/var/lib/postgresql/data
+  redis:
+    container_name: crud-api-cache
+    image: "redis:6.2-alpine"
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
 volumes:
   pgdata:
     external: true

@@ -4,6 +4,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/JavaHutt/crud-api/internal/model"
 )
@@ -17,14 +18,21 @@ type advertiseRepository interface {
 	Delete(ctx context.Context, id int) error
 }
 
+type cache interface {
+	Get(ctx context.Context, id string) (*model.Advertise, error)
+	Set(ctx context.Context, ad model.Advertise) error
+}
+
 type advertiseService struct {
-	rep advertiseRepository
+	rep   advertiseRepository
+	cache cache
 }
 
 // NewAdvertiseService is a constructor for advertise service
-func NewAdvertiseService(rep advertiseRepository) advertiseService {
+func NewAdvertiseService(rep advertiseRepository, cache cache) advertiseService {
 	return advertiseService{
-		rep: rep,
+		rep:   rep,
+		cache: cache,
 	}
 }
 
@@ -40,10 +48,18 @@ func (svc advertiseService) GetAll(ctx context.Context, page int, order string) 
 
 // Get selects single ad by it's ID
 func (svc advertiseService) Get(ctx context.Context, id int) (*model.Advertise, error) {
-	ad, err := svc.rep.Get(ctx, id)
+	ad, err := svc.cache.Get(ctx, strconv.Itoa(id))
+	if err == nil {
+		return ad, nil
+	}
+
+	ad, err = svc.rep.Get(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get advertise: %w", err)
 	}
+
+	_ = svc.cache.Set(ctx, *ad)
+
 	return ad, nil
 }
 

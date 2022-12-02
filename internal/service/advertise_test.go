@@ -6,6 +6,7 @@ import (
 
 	"github.com/JavaHutt/crud-api/internal/model"
 	"github.com/JavaHutt/crud-api/internal/service/mocks"
+	"github.com/go-redis/redis/v9"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -84,7 +85,7 @@ func TestGetAll(t *testing.T) {
 					Return(tc.repositoryMock.ads, tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo)
+			svc := NewAdvertiseService(mockRepo, nil)
 			actual, err := svc.GetAll(context.Background(), 0, "")
 
 			if tc.err != nil {
@@ -100,6 +101,15 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
+	type cacheGetMockData struct {
+		id string
+
+		ad  *model.Advertise
+		err error
+	}
+	type cacheSetMockData struct {
+		ad model.Advertise
+	}
 	type repositoryMockData struct {
 		id int
 
@@ -109,14 +119,33 @@ func TestGet(t *testing.T) {
 	testsCases := []struct {
 		name           string
 		id             int
+		cacheGetMock   *cacheGetMockData
+		cacheSetMock   *cacheSetMockData
 		repositoryMock *repositoryMockData
 
 		want *model.Advertise
 		err  error
 	}{
 		{
+			name: "advertise was cached before",
+			id:   1,
+			cacheGetMock: &cacheGetMockData{
+				id: "1",
+				ad: &advertise,
+			},
+			want: &advertise,
+		},
+		{
 			name: "storage error",
+			id:   1,
+			cacheGetMock: &cacheGetMockData{
+				id: "1",
+
+				err: redis.Nil,
+			},
 			repositoryMock: &repositoryMockData{
+				id: 1,
+
 				err: model.ErrStorage,
 			},
 			err: model.ErrStorage,
@@ -124,9 +153,17 @@ func TestGet(t *testing.T) {
 		{
 			name: "success",
 			id:   1,
+			cacheGetMock: &cacheGetMockData{
+				id: "1",
+
+				err: redis.Nil,
+			},
 			repositoryMock: &repositoryMockData{
 				id: 1,
 				ad: &advertise,
+			},
+			cacheSetMock: &cacheSetMockData{
+				ad: advertise,
 			},
 			want: &advertise,
 		},
@@ -135,13 +172,26 @@ func TestGet(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
 			mockRepo := mocks.NewMockadvertiseRepository(ctl)
+			mockCache := mocks.NewMockcache(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
 					Get(context.Background(), tc.repositoryMock.id).
 					Return(tc.repositoryMock.ad, tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo)
+			if tc.cacheGetMock != nil {
+				mockCache.EXPECT().
+					Get(context.Background(), tc.cacheGetMock.id).
+					Return(tc.cacheGetMock.ad, tc.cacheGetMock.err).
+					Times(1)
+			}
+			if tc.cacheSetMock != nil {
+				mockCache.EXPECT().
+					Set(context.Background(), tc.cacheSetMock.ad).
+					Return(nil).
+					Times(1)
+			}
+			svc := NewAdvertiseService(mockRepo, mockCache)
 			actual, err := svc.Get(context.Background(), tc.id)
 
 			if tc.err != nil {
@@ -194,7 +244,7 @@ func TestInsert(t *testing.T) {
 					Return(tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo)
+			svc := NewAdvertiseService(mockRepo, nil)
 			err := svc.Insert(context.Background(), tc.ad)
 
 			if tc.err != nil {
@@ -244,7 +294,7 @@ func TestInsertBulk(t *testing.T) {
 					Return(tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo)
+			svc := NewAdvertiseService(mockRepo, nil)
 			err := svc.InsertBulk(context.Background(), tc.ads)
 
 			if tc.err != nil {
@@ -294,7 +344,7 @@ func TestUpdate(t *testing.T) {
 					Return(tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo)
+			svc := NewAdvertiseService(mockRepo, nil)
 			err := svc.Update(context.Background(), tc.ad)
 
 			if tc.err != nil {
@@ -344,7 +394,7 @@ func TestDelete(t *testing.T) {
 					Return(tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo)
+			svc := NewAdvertiseService(mockRepo, nil)
 			err := svc.Delete(context.Background(), tc.id)
 
 			if tc.err != nil {
