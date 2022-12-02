@@ -24,7 +24,7 @@ Task description is in [backend-job-task.md](./docs/backend-job-task.md)
 - :ambulance: Swagger included
 - :test_tube: tests with mocks included (over 80% coverage)
 - :rotating_light: Linter coverage
-- :safety-vest: Github Actions with coverage check
+- :safety_vest: Github Actions with coverage check
 
 ## HOWTO
 Create config file in the root directory. Full list of environment variables is here [docs.md](./docs/docs.md), but you can use config from example:

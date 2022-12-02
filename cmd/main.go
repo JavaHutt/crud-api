@@ -2,7 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/JavaHutt/crud-api/config"
 	"github.com/JavaHutt/crud-api/internal/migrate"
@@ -44,5 +49,16 @@ func main() {
 	adSvc := service.NewAdvertiseService(rep, cache)
 	fakerSvc := service.NewFakerService()
 	srv := server.NewServer(config, adSvc, fakerSvc)
-	log.Panic(srv.Start())
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-c
+		fmt.Println("Gracefully shutting down...")
+		srv.Shutdown()
+	}()
+
+	if err = srv.Start(); err != nil && err != http.ErrServerClosed {
+		log.Panic(err)
+	}
 }
