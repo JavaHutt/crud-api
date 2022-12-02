@@ -20,3 +20,6 @@ lint	:
 swag:
 	swag init --parseDependency --parseInternal -g advertise.go -d ./internal/server,./internal/model -o api -ot yaml,go & \
 	swag fmt
+
+docker	:
+	docker build -t crud-api .

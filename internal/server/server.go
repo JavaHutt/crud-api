@@ -6,6 +6,7 @@ import (
 	_ "github.com/JavaHutt/crud-api/api"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
 )
 
@@ -44,6 +45,7 @@ func NewServer(cfg config, adSvc advertiseService, fakerSvc fakerService) server
 		WriteTimeout:   cfg.WriteTimeout(),
 		ReadBufferSize: 8192,
 	})
+	app.Use(logger.New())
 
 	return server{
 		app:      app,
