@@ -76,12 +76,12 @@ func TestGetAll(t *testing.T) {
 			mockRepo := mocks.NewMockqueryRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
-					GetAll(context.Background(), 0, "").
+					GetAll(context.Background(), 0, "", "").
 					Return(tc.repositoryMock.queries, tc.repositoryMock.err).
 					Times(1)
 			}
 			svc := NewQueryService(mockRepo, nil)
-			actual, err := svc.GetAll(context.Background(), 0, "")
+			actual, err := svc.GetAll(context.Background(), 0, "", "")
 
 			if tc.err != nil {
 				require.Nil(t, actual)

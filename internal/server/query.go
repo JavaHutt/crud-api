@@ -12,13 +12,14 @@ import (
 )
 
 const (
-	idParam   = "id"
-	sortQuery = "sort"
-	pageQuery = "page"
+	idParam        = "id"
+	sortQuery      = "sort"
+	pageQuery      = "page"
+	statementQuery = "statement"
 )
 
 type queryService interface {
-	GetAll(ctx context.Context, page int, order string) ([]model.SlowestQuery, error)
+	GetAll(ctx context.Context, page int, order string, statement model.QueryStatement) ([]model.SlowestQuery, error)
 	Get(ctx context.Context, id int) (*model.SlowestQuery, error)
 	Insert(ctx context.Context, query model.SlowestQuery) error
 	InsertBulk(ctx context.Context, queries []model.SlowestQuery) error
@@ -48,8 +49,9 @@ func (h queryHandler) Routes(router fiber.Router) {
 // @Summary Gets all Query entities
 // @Tags    query
 // @Produce json
-// @Param   sort query    string false "asc,desc"
-// @Param   page query    int    false "page number, e.g. 2"
+// @Param   sort      query    string false "asc,desc"
+// @Param   page      query    int    false "page number, e.g. 2"
+// @Param   statement query    string false "select,insert,update,delete"
 // @Success 200  {object} []model.SlowestQuery
 // @Failure 500
 // @Router  /api/v1/query [get]
@@ -62,7 +64,11 @@ func (h queryHandler) getAll(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	res, err := h.svc.GetAll(c.Context(), page, sort)
+	statement, err := getStatementQuery(c)
+	if err != nil {
+		return err
+	}
+	res, err := h.svc.GetAll(c.Context(), page, sort, statement)
 	if err != nil {
 		return encodeError(err)
 	}
@@ -189,4 +195,18 @@ func getPageQuery(c *fiber.Ctx) (int, error) {
 		return 0, badRequest(fmt.Sprintf("invalid page param: %s", pageStr))
 	}
 	return page, nil
+}
+
+func getStatementQuery(c *fiber.Ctx) (model.QueryStatement, error) {
+	statement := model.QueryStatement(c.Query(statementQuery))
+	switch model.QueryStatement(statement) {
+	case "",
+		model.QueryStatementSelect,
+		model.QueryStatementInsert,
+		model.QueryStatementUpdate,
+		model.QueryStatementDelete:
+		return statement, nil
+	default:
+		return "", badRequest(fmt.Sprintf("bad statement query param: %s", statement))
+	}
 }

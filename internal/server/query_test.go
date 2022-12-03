@@ -34,8 +34,9 @@ var (
 
 func TestGetAll(t *testing.T) {
 	type serviceMockData struct {
-		page int
-		sort string
+		page      int
+		sort      string
+		statement model.QueryStatement
 
 		queries []model.SlowestQuery
 		err     error
@@ -44,6 +45,7 @@ func TestGetAll(t *testing.T) {
 		name        string
 		page        string
 		sort        string
+		statement   string
 		serviceMock *serviceMockData
 
 		status int
@@ -59,6 +61,13 @@ func TestGetAll(t *testing.T) {
 			sort:   "asc",
 			page:   "one",
 			status: http.StatusBadRequest,
+		},
+		{
+			name:      "bad statement query param",
+			sort:      "asc",
+			page:      "1",
+			statement: "upsert",
+			status:    http.StatusBadRequest,
 		},
 		{
 			name: "storage error",
@@ -91,7 +100,7 @@ func TestGetAll(t *testing.T) {
 
 			if tc.serviceMock != nil {
 				mockSvc.EXPECT().
-					GetAll(gomock.Any(), tc.serviceMock.page, tc.serviceMock.sort).
+					GetAll(gomock.Any(), tc.serviceMock.page, tc.serviceMock.sort, tc.serviceMock.statement).
 					Return(tc.serviceMock.queries, tc.serviceMock.err).
 					Times(1)
 			}
@@ -102,6 +111,9 @@ func TestGetAll(t *testing.T) {
 			target := "/"
 			if tc.sort != "" {
 				target = fmt.Sprintf("%s?page=%s&sort=%s", target, tc.page, tc.sort)
+			}
+			if tc.statement != "" {
+				target = fmt.Sprintf("%s&statement=%s", target, tc.statement)
 			}
 
 			req := httptest.NewRequest(http.MethodGet, target, nil)

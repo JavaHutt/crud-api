@@ -65,18 +65,18 @@ func (mr *MockqueryRepositoryMockRecorder) Get(ctx, id interface{}) *gomock.Call
 }
 
 // GetAll mocks base method.
-func (m *MockqueryRepository) GetAll(ctx context.Context, page int, order string) ([]model.SlowestQuery, error) {
+func (m *MockqueryRepository) GetAll(ctx context.Context, page int, order string, statement model.QueryStatement) ([]model.SlowestQuery, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAll", ctx, page, order)
+	ret := m.ctrl.Call(m, "GetAll", ctx, page, order, statement)
 	ret0, _ := ret[0].([]model.SlowestQuery)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAll indicates an expected call of GetAll.
-func (mr *MockqueryRepositoryMockRecorder) GetAll(ctx, page, order interface{}) *gomock.Call {
+func (mr *MockqueryRepositoryMockRecorder) GetAll(ctx, page, order, statement interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockqueryRepository)(nil).GetAll), ctx, page, order)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockqueryRepository)(nil).GetAll), ctx, page, order, statement)
 }
 
 // Insert mocks base method.

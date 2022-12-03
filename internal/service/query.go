@@ -10,7 +10,7 @@ import (
 )
 
 type queryRepository interface {
-	GetAll(ctx context.Context, page int, order string) ([]model.SlowestQuery, error)
+	GetAll(ctx context.Context, page int, order string, statement model.QueryStatement) ([]model.SlowestQuery, error)
 	Get(ctx context.Context, id int) (*model.SlowestQuery, error)
 	Insert(ctx context.Context, query model.SlowestQuery) error
 	InsertBulk(ctx context.Context, queries []model.SlowestQuery) error
@@ -37,8 +37,8 @@ func NewQueryService(rep queryRepository, cache cache) queryService {
 }
 
 // GetAll selects all the queries
-func (svc queryService) GetAll(ctx context.Context, page int, order string) ([]model.SlowestQuery, error) {
-	queries, err := svc.rep.GetAll(ctx, page, order)
+func (svc queryService) GetAll(ctx context.Context, page int, order string, statement model.QueryStatement) ([]model.SlowestQuery, error) {
+	queries, err := svc.rep.GetAll(ctx, page, order, statement)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all queries: %w", err)
 	}

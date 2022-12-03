@@ -29,14 +29,21 @@ func NewQueryRepo(db *bun.DB) queriesRepo {
 }
 
 // GetAll selects all the queries
-func (rep queriesRepo) GetAll(ctx context.Context, page int, sort string) ([]model.SlowestQuery, error) {
+func (rep queriesRepo) GetAll(ctx context.Context, page int, sort string, statement model.QueryStatement) ([]model.SlowestQuery, error) {
 	order := "id ASC"
 	if sort != "" {
 		order = fmt.Sprintf("%s %s, %s", timeSpentColumn, sort, order)
 	}
+
 	var queries []model.SlowestQuery
-	if err := rep.db.NewSelect().Model(&queries).OrderExpr(order).
-		Limit(perPage).Offset((page - 1) * perPage).Scan(ctx); err != nil {
+	qb := rep.db.NewSelect().Model(&queries).OrderExpr(order).
+		Limit(perPage).Offset((page - 1) * perPage)
+
+	if statement != "" {
+		qb.Where("statement = ?", statement)
+	}
+
+	if err := qb.Scan(ctx); err != nil {
 		return nil, err
 	}
 	return queries, nil
