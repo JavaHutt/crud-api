@@ -30,8 +30,9 @@ var (
 
 func TestGetAll(t *testing.T) {
 	type repositoryMockData struct {
-		page int
-		sort string
+		page      int
+		sort      string
+		statement model.QueryStatement
 
 		queries []model.SlowestQuery
 		err     error
@@ -40,30 +41,35 @@ func TestGetAll(t *testing.T) {
 		name           string
 		page           int
 		sort           string
+		statement      model.QueryStatement
 		repositoryMock *repositoryMockData
 
 		want []model.SlowestQuery
 		err  error
 	}{
 		{
-			name: "storage error",
-			page: 1,
-			sort: "asc",
+			name:      "storage error",
+			page:      1,
+			sort:      "asc",
+			statement: model.QueryStatementSelect,
 			repositoryMock: &repositoryMockData{
-				page: 1,
-				sort: "asc",
+				page:      1,
+				sort:      "asc",
+				statement: model.QueryStatementSelect,
 
 				err: model.ErrStorage,
 			},
 			err: model.ErrStorage,
 		},
 		{
-			name: "success",
-			page: 1,
-			sort: "asc",
+			name:      "success",
+			page:      1,
+			sort:      "asc",
+			statement: model.QueryStatementSelect,
 			repositoryMock: &repositoryMockData{
-				page: 1,
-				sort: "asc",
+				page:      1,
+				sort:      "asc",
+				statement: model.QueryStatementSelect,
 
 				queries: []model.SlowestQuery{slowQuery, slowestQuery},
 			},
@@ -76,12 +82,12 @@ func TestGetAll(t *testing.T) {
 			mockRepo := mocks.NewMockqueryRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
-					GetAll(context.Background(), 0, "", "").
+					GetAll(context.Background(), tc.repositoryMock.page, tc.repositoryMock.sort, tc.repositoryMock.statement).
 					Return(tc.repositoryMock.queries, tc.repositoryMock.err).
 					Times(1)
 			}
 			svc := NewQueryService(mockRepo, nil)
-			actual, err := svc.GetAll(context.Background(), 0, "", "")
+			actual, err := svc.GetAll(context.Background(), tc.page, tc.sort, tc.statement)
 
 			if tc.err != nil {
 				require.Nil(t, actual)

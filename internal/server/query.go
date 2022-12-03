@@ -52,7 +52,7 @@ func (h queryHandler) Routes(router fiber.Router) {
 // @Param   sort      query    string false "asc,desc"
 // @Param   page      query    int    false "page number, e.g. 2"
 // @Param   statement query    string false "select,insert,update,delete"
-// @Success 200  {object} []model.SlowestQuery
+// @Success 200       {object} []model.SlowestQuery
 // @Failure 500
 // @Router  /api/v1/query [get]
 func (h queryHandler) getAll(c *fiber.Ctx) error {
