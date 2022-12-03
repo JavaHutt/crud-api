@@ -26,4 +26,5 @@ type SlowestQuery struct {
 	TimeSpent int            `json:"time_spent" bun:",notnull" validate:"required,number"`
 	CreatedAt time.Time      `json:"created_at" bun:",nullzero,notnull,default:current_timestamp"`
 	UpdatedAt time.Time      `json:"updated_at" bun:",nullzero,notnull,default:current_timestamp"`
+	DeletedAt *time.Time     `json:"deleted_at,omitempty" bun:",soft_delete,nullzero"`
 }

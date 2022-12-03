@@ -14,6 +14,8 @@ import (
 
 const (
 	timeSpentColumn = "time_spent"
+	statementColumn = "statement"
+	createdAtColumn = "created_at"
 	perPage         = 10
 )
 
@@ -40,7 +42,7 @@ func (rep queriesRepo) GetAll(ctx context.Context, page int, sort string, statem
 		Limit(perPage).Offset((page - 1) * perPage)
 
 	if statement != "" {
-		qb.Where("statement = ?", statement)
+		qb.Where("? = ?", bun.Ident(statementColumn), statement)
 	}
 
 	if err := qb.Scan(ctx); err != nil {
@@ -78,7 +80,7 @@ func (rep queriesRepo) InsertBulk(ctx context.Context, queries []model.SlowestQu
 func (rep queriesRepo) Update(ctx context.Context, query model.SlowestQuery) error {
 	query.UpdatedAt = time.Now().UTC()
 	_, err := rep.db.NewUpdate().Model(&query).
-		ExcludeColumn("created_at").
+		ExcludeColumn(createdAtColumn).
 		OmitZero().WherePK().Exec(ctx)
 	if errors.Is(err, sql.ErrNoRows) {
 		return model.ErrNotFound
