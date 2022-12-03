@@ -1,6 +1,11 @@
 ## API Documentation
 Documentation can be found [here](http://localhost:3000/swagger/index.html)
 
+## Schema
+The Database Schema is quite simple
+<br>
+<img width="25%" src="../assets/schema.png">
+
 ## Config File
 The app supports a config file in YAML format.
 The name of this file is `app.yaml`, the location is the `root directory`.

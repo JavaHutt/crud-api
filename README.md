@@ -50,4 +50,4 @@ make down
 
 ## Proof of work
 
-<img src="./assets/working-example.png">
+<img src="./assets/example.png">
