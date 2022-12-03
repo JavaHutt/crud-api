@@ -5,21 +5,16 @@ import "github.com/go-playground/validator/v10"
 var Validate = validator.New()
 
 func RegisterValidators() {
-	_ = Validate.RegisterValidation("kindenum", validateKind)
+	_ = Validate.RegisterValidation("statementenum", validateStatement)
 }
 
-func validateKind(fl validator.FieldLevel) bool {
-	kind := fl.Field().String()
-	switch AdvertiseKind(kind) {
-	case AdvertiseKindBillboard,
-		AdvertiseKindCitylight,
-		AdvertiseKindStander,
-		AdvertiseKindLightbox,
-		AdvertiseKindPillar,
-		AdvertiseKindTransition,
-		AdvertiseKindSignboard,
-		AdvertiseKindAeroman,
-		AdvertiseKindNeon:
+func validateStatement(fl validator.FieldLevel) bool {
+	statement := fl.Field().String()
+	switch QueryStatement(statement) {
+	case QueryStatementSelect,
+		QueryStatementInsert,
+		QueryStatementUpdate,
+		QueryStatementDelete:
 		return true
 	default:
 		return false

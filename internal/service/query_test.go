@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/JavaHutt/crud-api/internal/model"
 	"github.com/JavaHutt/crud-api/internal/service/mocks"
@@ -13,23 +14,17 @@ import (
 )
 
 var (
-	advertise = model.Advertise{
-		ID:       1,
-		Name:     "Banner",
-		Kind:     model.AdvertiseKindStander,
-		Provider: "plista",
-		Country:  "Switzerland",
-		City:     "Bern",
-		Street:   "Main street",
+	slowQuery = model.SlowestQuery{
+		ID:        1,
+		Query:     "SELECT * FROM users",
+		Statement: model.QueryStatementSelect,
+		TimeSpent: int(5 * time.Second),
 	}
-	anotherAdvertise = model.Advertise{
-		ID:       2,
-		Name:     "Neon",
-		Kind:     model.AdvertiseKindNeon,
-		Provider: "nativex",
-		Country:  "USA",
-		City:     "Vice City",
-		Street:   "Ocean View",
+	slowestQuery = model.SlowestQuery{
+		ID:        2,
+		Query:     "UPDATE products SET name = \"scam\" ",
+		Statement: model.QueryStatementUpdate,
+		TimeSpent: int(10 * time.Second),
 	}
 )
 
@@ -38,8 +33,8 @@ func TestGetAll(t *testing.T) {
 		page int
 		sort string
 
-		ads []model.Advertise
-		err error
+		queries []model.SlowestQuery
+		err     error
 	}
 	testsCases := []struct {
 		name           string
@@ -47,7 +42,7 @@ func TestGetAll(t *testing.T) {
 		sort           string
 		repositoryMock *repositoryMockData
 
-		want []model.Advertise
+		want []model.SlowestQuery
 		err  error
 	}{
 		{
@@ -70,22 +65,22 @@ func TestGetAll(t *testing.T) {
 				page: 1,
 				sort: "asc",
 
-				ads: []model.Advertise{advertise, anotherAdvertise},
+				queries: []model.SlowestQuery{slowQuery, slowestQuery},
 			},
-			want: []model.Advertise{advertise, anotherAdvertise},
+			want: []model.SlowestQuery{slowQuery, slowestQuery},
 		},
 	}
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockadvertiseRepository(ctl)
+			mockRepo := mocks.NewMockqueryRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
 					GetAll(context.Background(), 0, "").
-					Return(tc.repositoryMock.ads, tc.repositoryMock.err).
+					Return(tc.repositoryMock.queries, tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo, nil)
+			svc := NewQueryService(mockRepo, nil)
 			actual, err := svc.GetAll(context.Background(), 0, "")
 
 			if tc.err != nil {
@@ -104,17 +99,17 @@ func TestGet(t *testing.T) {
 	type cacheGetMockData struct {
 		id string
 
-		ad  *model.Advertise
-		err error
+		query *model.SlowestQuery
+		err   error
 	}
 	type cacheSetMockData struct {
-		ad model.Advertise
+		query *model.SlowestQuery
 	}
 	type repositoryMockData struct {
 		id int
 
-		ad  *model.Advertise
-		err error
+		query *model.SlowestQuery
+		err   error
 	}
 	testsCases := []struct {
 		name           string
@@ -123,17 +118,17 @@ func TestGet(t *testing.T) {
 		cacheSetMock   *cacheSetMockData
 		repositoryMock *repositoryMockData
 
-		want *model.Advertise
+		want *model.SlowestQuery
 		err  error
 	}{
 		{
-			name: "advertise was cached before",
+			name: "query was cached before",
 			id:   1,
 			cacheGetMock: &cacheGetMockData{
-				id: "1",
-				ad: &advertise,
+				id:    "1",
+				query: &slowQuery,
 			},
-			want: &advertise,
+			want: &slowQuery,
 		},
 		{
 			name: "storage error",
@@ -159,39 +154,39 @@ func TestGet(t *testing.T) {
 				err: redis.Nil,
 			},
 			repositoryMock: &repositoryMockData{
-				id: 1,
-				ad: &advertise,
+				id:    1,
+				query: &slowQuery,
 			},
 			cacheSetMock: &cacheSetMockData{
-				ad: advertise,
+				query: &slowQuery,
 			},
-			want: &advertise,
+			want: &slowQuery,
 		},
 	}
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockadvertiseRepository(ctl)
+			mockRepo := mocks.NewMockqueryRepository(ctl)
 			mockCache := mocks.NewMockcache(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
 					Get(context.Background(), tc.repositoryMock.id).
-					Return(tc.repositoryMock.ad, tc.repositoryMock.err).
+					Return(tc.repositoryMock.query, tc.repositoryMock.err).
 					Times(1)
 			}
 			if tc.cacheGetMock != nil {
 				mockCache.EXPECT().
 					Get(context.Background(), tc.cacheGetMock.id).
-					Return(tc.cacheGetMock.ad, tc.cacheGetMock.err).
+					Return(tc.cacheGetMock.query, tc.cacheGetMock.err).
 					Times(1)
 			}
 			if tc.cacheSetMock != nil {
 				mockCache.EXPECT().
-					Set(context.Background(), tc.cacheSetMock.ad).
+					Set(context.Background(), tc.cacheSetMock.query).
 					Return(nil).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo, mockCache)
+			svc := NewQueryService(mockRepo, mockCache)
 			actual, err := svc.Get(context.Background(), tc.id)
 
 			if tc.err != nil {
@@ -208,13 +203,13 @@ func TestGet(t *testing.T) {
 
 func TestInsert(t *testing.T) {
 	type repositoryMockData struct {
-		ad model.Advertise
+		query model.SlowestQuery
 
 		err error
 	}
 	testsCases := []struct {
 		name           string
-		ad             model.Advertise
+		query          model.SlowestQuery
 		repositoryMock *repositoryMockData
 
 		err error
@@ -227,25 +222,25 @@ func TestInsert(t *testing.T) {
 			err: model.ErrStorage,
 		},
 		{
-			name: "success",
-			ad:   advertise,
+			name:  "success",
+			query: slowQuery,
 			repositoryMock: &repositoryMockData{
-				ad: advertise,
+				query: slowQuery,
 			},
 		},
 	}
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockadvertiseRepository(ctl)
+			mockRepo := mocks.NewMockqueryRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
-					Insert(context.Background(), tc.repositoryMock.ad).
+					Insert(context.Background(), tc.repositoryMock.query).
 					Return(tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo, nil)
-			err := svc.Insert(context.Background(), tc.ad)
+			svc := NewQueryService(mockRepo, nil)
+			err := svc.Insert(context.Background(), tc.query)
 
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
@@ -258,13 +253,13 @@ func TestInsert(t *testing.T) {
 
 func TestInsertBulk(t *testing.T) {
 	type repositoryMockData struct {
-		ads []model.Advertise
+		queries []model.SlowestQuery
 
 		err error
 	}
 	testsCases := []struct {
 		name           string
-		ads            []model.Advertise
+		queries        []model.SlowestQuery
 		repositoryMock *repositoryMockData
 
 		err error
@@ -277,25 +272,25 @@ func TestInsertBulk(t *testing.T) {
 			err: model.ErrStorage,
 		},
 		{
-			name: "success",
-			ads:  []model.Advertise{advertise, anotherAdvertise},
+			name:    "success",
+			queries: []model.SlowestQuery{slowQuery, slowestQuery},
 			repositoryMock: &repositoryMockData{
-				ads: []model.Advertise{advertise, anotherAdvertise},
+				queries: []model.SlowestQuery{slowQuery, slowestQuery},
 			},
 		},
 	}
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockadvertiseRepository(ctl)
+			mockRepo := mocks.NewMockqueryRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
-					InsertBulk(context.Background(), tc.repositoryMock.ads).
+					InsertBulk(context.Background(), tc.repositoryMock.queries).
 					Return(tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo, nil)
-			err := svc.InsertBulk(context.Background(), tc.ads)
+			svc := NewQueryService(mockRepo, nil)
+			err := svc.InsertBulk(context.Background(), tc.queries)
 
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
@@ -308,13 +303,13 @@ func TestInsertBulk(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	type repositoryMockData struct {
-		ad model.Advertise
+		query model.SlowestQuery
 
 		err error
 	}
 	testsCases := []struct {
 		name           string
-		ad             model.Advertise
+		query          model.SlowestQuery
 		repositoryMock *repositoryMockData
 
 		err error
@@ -327,25 +322,25 @@ func TestUpdate(t *testing.T) {
 			err: model.ErrStorage,
 		},
 		{
-			name: "success",
-			ad:   advertise,
+			name:  "success",
+			query: slowQuery,
 			repositoryMock: &repositoryMockData{
-				ad: advertise,
+				query: slowQuery,
 			},
 		},
 	}
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockadvertiseRepository(ctl)
+			mockRepo := mocks.NewMockqueryRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
-					Update(context.Background(), tc.repositoryMock.ad).
+					Update(context.Background(), tc.repositoryMock.query).
 					Return(tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo, nil)
-			err := svc.Update(context.Background(), tc.ad)
+			svc := NewQueryService(mockRepo, nil)
+			err := svc.Update(context.Background(), tc.query)
 
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
@@ -387,14 +382,14 @@ func TestDelete(t *testing.T) {
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockRepo := mocks.NewMockadvertiseRepository(ctl)
+			mockRepo := mocks.NewMockqueryRepository(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
 					Delete(context.Background(), tc.repositoryMock.id).
 					Return(tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewAdvertiseService(mockRepo, nil)
+			svc := NewQueryService(mockRepo, nil)
 			err := svc.Delete(context.Background(), tc.id)
 
 			if tc.err != nil {

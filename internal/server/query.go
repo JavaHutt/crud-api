@@ -1,4 +1,4 @@
-//go:generate mockgen -source advertise.go -destination=./mocks/advertise.go -package=mocks
+//go:generate mockgen -source query.go -destination=./mocks/query.go -package=mocks
 package server
 
 import (
@@ -17,26 +17,26 @@ const (
 	pageQuery = "page"
 )
 
-type advertiseService interface {
-	GetAll(ctx context.Context, page int, order string) ([]model.Advertise, error)
-	Get(ctx context.Context, id int) (*model.Advertise, error)
-	Insert(ctx context.Context, advertise model.Advertise) error
-	InsertBulk(ctx context.Context, ads []model.Advertise) error
-	Update(ctx context.Context, advertise model.Advertise) error
+type queryService interface {
+	GetAll(ctx context.Context, page int, order string) ([]model.SlowestQuery, error)
+	Get(ctx context.Context, id int) (*model.SlowestQuery, error)
+	Insert(ctx context.Context, query model.SlowestQuery) error
+	InsertBulk(ctx context.Context, queries []model.SlowestQuery) error
+	Update(ctx context.Context, query model.SlowestQuery) error
 	Delete(ctx context.Context, id int) error
 }
 
-type advertiseHandler struct {
-	svc advertiseService
+type queryHandler struct {
+	svc queryService
 }
 
-func newAdvertiseHandler(svc advertiseService) advertiseHandler {
-	return advertiseHandler{
+func newQueryHandler(svc queryService) queryHandler {
+	return queryHandler{
 		svc: svc,
 	}
 }
 
-func (h advertiseHandler) Routes(router fiber.Router) {
+func (h queryHandler) Routes(router fiber.Router) {
 	router.Get("/", h.getAll)
 	router.Get("/:id", h.get)
 	router.Post("/", h.create)
@@ -45,15 +45,15 @@ func (h advertiseHandler) Routes(router fiber.Router) {
 }
 
 // getAll godoc
-// @Summary Gets all Advertise entities
-// @Tags    advertise
+// @Summary Gets all Query entities
+// @Tags    query
 // @Produce json
 // @Param   sort query    string false "asc,desc"
 // @Param   page query    int    false "page number, e.g. 2"
-// @Success 200  {object} []model.Advertise
+// @Success 200  {object} []model.SlowestQuery
 // @Failure 500
-// @Router  /api/v1/advertise [get]
-func (h advertiseHandler) getAll(c *fiber.Ctx) error {
+// @Router  /api/v1/query [get]
+func (h queryHandler) getAll(c *fiber.Ctx) error {
 	sort, err := getSortQuery(c)
 	if err != nil {
 		return err
@@ -71,14 +71,14 @@ func (h advertiseHandler) getAll(c *fiber.Ctx) error {
 }
 
 // get godoc
-// @Summary Get single Advertise entity
-// @Tags    advertise
+// @Summary Get single query entity
+// @Tags    query
 // @Produce json
 // @Param   id  path     int true "id of the ad"
-// @Success 200 {object} model.Advertise
+// @Success 200 {object} model.SlowestQuery
 // @Failure 500
-// @Router  /api/v1/advertise [get]
-func (h advertiseHandler) get(c *fiber.Ctx) error {
+// @Router  /api/v1/query [get]
+func (h queryHandler) get(c *fiber.Ctx) error {
 	id, err := getIDParam(c)
 	if err != nil {
 		return err
@@ -93,23 +93,23 @@ func (h advertiseHandler) get(c *fiber.Ctx) error {
 }
 
 // create godoc
-// @Summary Creates a single Advertise entity
-// @Tags    advertise
+// @Summary Creates a single Query entity
+// @Tags    query
 // @Accept  json
 // @Success 201
 // @Failure 500
-// @Router  /api/v1/advertise [post]
-func (h advertiseHandler) create(c *fiber.Ctx) error {
-	ad := new(model.Advertise)
-	if err := c.BodyParser(ad); err != nil {
+// @Router  /api/v1/query [post]
+func (h queryHandler) create(c *fiber.Ctx) error {
+	query := new(model.SlowestQuery)
+	if err := c.BodyParser(query); err != nil {
 		return badRequest(fmt.Sprintf("failed to decode body: %s", err.Error()))
 	}
 
-	if err := model.Validate.Struct(ad); err != nil {
+	if err := model.Validate.Struct(query); err != nil {
 		return badRequest(err.Error())
 	}
 
-	if err := h.svc.Insert(c.Context(), *ad); err != nil {
+	if err := h.svc.Insert(c.Context(), *query); err != nil {
 		return encodeError(err)
 	}
 
@@ -117,25 +117,25 @@ func (h advertiseHandler) create(c *fiber.Ctx) error {
 }
 
 // update godoc
-// @Summary Update single Advertise entity
-// @Tags    advertise
-// @Param   id path int true "id of the ad"
+// @Summary Update single query entity
+// @Tags    query
+// @Param   id path int true "id of the query"
 // @Success 204
 // @Failure 500
-// @Router  /api/v1/advertise [put]
-func (h advertiseHandler) update(c *fiber.Ctx) error {
+// @Router  /api/v1/query [put]
+func (h queryHandler) update(c *fiber.Ctx) error {
 	id, err := getIDParam(c)
 	if err != nil {
 		return err
 	}
 
-	ad := new(model.Advertise)
-	if err = c.BodyParser(ad); err != nil {
+	query := new(model.SlowestQuery)
+	if err = c.BodyParser(query); err != nil {
 		return badRequest(fmt.Sprintf("failed to decode body: %s", err.Error()))
 	}
 
-	ad.ID = int64(id)
-	if err := h.svc.Update(c.Context(), *ad); err != nil {
+	query.ID = int64(id)
+	if err := h.svc.Update(c.Context(), *query); err != nil {
 		return encodeError(err)
 	}
 
@@ -143,13 +143,13 @@ func (h advertiseHandler) update(c *fiber.Ctx) error {
 }
 
 // delete godoc
-// @Summary Delete single Advertise entity
-// @Tags    advertise
-// @Param   id path int true "id of the ad"
+// @Summary Delete single query entity
+// @Tags    query
+// @Param   id path int true "id of the query"
 // @Success 204
 // @Failure 500
-// @Router  /api/v1/advertise [delete]
-func (h advertiseHandler) delete(c *fiber.Ctx) error {
+// @Router  /api/v1/query [delete]
+func (h queryHandler) delete(c *fiber.Ctx) error {
 	id, err := getIDParam(c)
 	if err != nil {
 		return err

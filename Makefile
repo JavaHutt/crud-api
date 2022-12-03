@@ -21,7 +21,7 @@ lint	:
 	golangci-lint run --timeout 5m0s
 
 swag	:
-	swag init --parseDependency --parseInternal -g advertise.go -d ./internal/server,./internal/model -o api -ot yaml,go & \
+	swag init --parseDependency --parseInternal -g query.go -d ./internal/server,./internal/model -o api -ot yaml,go & \
 	swag fmt
 
 docker	:

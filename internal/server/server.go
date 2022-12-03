@@ -21,7 +21,7 @@ type config interface {
 type server struct {
 	app      *fiber.App
 	port     string
-	adSvc    advertiseService
+	querySvc queryService
 	fakerSvc fakerService
 }
 
@@ -36,7 +36,7 @@ type server struct {
 // @host     localhost:3000
 // @BasePath /
 // @schemes  http
-func NewServer(cfg config, adSvc advertiseService, fakerSvc fakerService) server {
+func NewServer(cfg config, querySvc queryService, fakerSvc fakerService) server {
 	app := fiber.New(fiber.Config{
 		AppName:        cfg.AppName(),
 		ServerHeader:   "Fiber",
@@ -50,7 +50,7 @@ func NewServer(cfg config, adSvc advertiseService, fakerSvc fakerService) server
 	return server{
 		app:      app,
 		port:     cfg.APIAddress(),
-		adSvc:    adSvc,
+		querySvc: querySvc,
 		fakerSvc: fakerSvc,
 	}
 }
@@ -67,6 +67,6 @@ func (s server) Shutdown() error {
 func (s *server) setupRoutes() {
 	s.app.Get("/swagger/*", swagger.HandlerDefault)
 	v1 := s.app.Group("/api/v1")
-	v1.Route("/advertise", newAdvertiseHandler(s.adSvc).Routes)
-	v1.Route("/faker", newFakerHandler(s.fakerSvc, s.adSvc).Routes)
+	v1.Route("/query", newQueryHandler(s.querySvc).Routes)
+	v1.Route("/faker", newFakerHandler(s.fakerSvc, s.querySvc).Routes)
 }

@@ -44,11 +44,11 @@ func main() {
 		log.Panic(err)
 	}
 
-	rep := repository.NewAdvertiseRepo(db)
+	rep := repository.NewQueryRepo(db)
 	cache := repository.NewCache(redis, repository.WithExpiration(config.CacheExpiration()))
-	adSvc := service.NewAdvertiseService(rep, cache)
+	querySvc := service.NewQueryService(rep, cache)
 	fakerSvc := service.NewFakerService()
-	srv := server.NewServer(config, adSvc, fakerSvc)
+	srv := server.NewServer(config, querySvc, fakerSvc)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)

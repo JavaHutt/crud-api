@@ -18,10 +18,10 @@ func TestFake(t *testing.T) {
 	type fakerSvcMockData struct {
 		num int
 
-		ads []model.Advertise
+		queries []model.SlowestQuery
 	}
-	type adsSvcMockData struct {
-		ads []model.Advertise
+	type qSvcMockData struct {
+		queries []model.SlowestQuery
 
 		err error
 	}
@@ -29,7 +29,7 @@ func TestFake(t *testing.T) {
 		name         string
 		num          int
 		fakerSvcMock *fakerSvcMockData
-		adsSvcMock   *adsSvcMockData
+		qSvcMock     *qSvcMockData
 
 		status int
 	}{
@@ -37,11 +37,11 @@ func TestFake(t *testing.T) {
 			name: "success",
 			num:  2,
 			fakerSvcMock: &fakerSvcMockData{
-				num: 2,
-				ads: []model.Advertise{advertise, anotherAdvertise},
+				num:     2,
+				queries: []model.SlowestQuery{slowQuery, slowestQuery},
 			},
-			adsSvcMock: &adsSvcMockData{
-				ads: []model.Advertise{advertise, anotherAdvertise},
+			qSvcMock: &qSvcMockData{
+				queries: []model.SlowestQuery{slowQuery, slowestQuery},
 			},
 			status: http.StatusOK,
 		},
@@ -50,24 +50,24 @@ func TestFake(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
 			fakerSvc := mocks.NewMockfakerService(ctl)
-			adsSvc := mocks.NewMockadsService(ctl)
+			qSvc := mocks.NewMockquerService(ctl)
 
 			if tc.fakerSvcMock != nil {
 				fakerSvc.EXPECT().
 					Fake(tc.fakerSvcMock.num).
-					Return(tc.fakerSvcMock.ads).
+					Return(tc.fakerSvcMock.queries).
 					Times(1)
 			}
 
-			if tc.adsSvcMock != nil {
-				adsSvc.EXPECT().
-					InsertBulk(gomock.Any(), tc.adsSvcMock.ads).
-					Return(tc.adsSvcMock.err).
+			if tc.qSvcMock != nil {
+				qSvc.EXPECT().
+					InsertBulk(gomock.Any(), tc.qSvcMock.queries).
+					Return(tc.qSvcMock.err).
 					Times(1)
 			}
 			app := fiber.New()
-			handler := newFakerHandler(fakerSvc, adsSvc)
-			app.Get("/", handler.fake)
+			handler := newFakerHandler(fakerSvc, qSvc)
+			app.Get("/", handler.faker)
 
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/?num=%d", tc.num), nil)
 			resp, err := app.Test(req)

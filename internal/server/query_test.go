@@ -1,4 +1,4 @@
-//go:generate mockgen -source advertise.go -destination=./mocks/advertise.go -package=mocks
+//go:generate mockgen -source query.go -destination=./mocks/query.go -package=mocks
 package server
 
 import (
@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/JavaHutt/crud-api/internal/model"
 	"github.com/JavaHutt/crud-api/internal/server/mocks"
@@ -17,23 +18,17 @@ import (
 )
 
 var (
-	advertise = model.Advertise{
-		ID:       1,
-		Name:     "Banner",
-		Kind:     model.AdvertiseKindStander,
-		Provider: "plista",
-		Country:  "Switzerland",
-		City:     "Bern",
-		Street:   "Main street",
+	slowQuery = model.SlowestQuery{
+		ID:        1,
+		Query:     "SELECT * FROM users",
+		Statement: model.QueryStatementSelect,
+		TimeSpent: int(5 * time.Second),
 	}
-	anotherAdvertise = model.Advertise{
-		ID:       2,
-		Name:     "Neon",
-		Kind:     model.AdvertiseKindNeon,
-		Provider: "nativex",
-		Country:  "USA",
-		City:     "Vice City",
-		Street:   "Ocean View",
+	slowestQuery = model.SlowestQuery{
+		ID:        2,
+		Query:     "UPDATE products SET name = \"scam\" ",
+		Statement: model.QueryStatementUpdate,
+		TimeSpent: int(10 * time.Second),
 	}
 )
 
@@ -42,8 +37,8 @@ func TestGetAll(t *testing.T) {
 		page int
 		sort string
 
-		ads []model.Advertise
-		err error
+		queries []model.SlowestQuery
+		err     error
 	}
 	testsCases := []struct {
 		name        string
@@ -52,7 +47,7 @@ func TestGetAll(t *testing.T) {
 		serviceMock *serviceMockData
 
 		status int
-		want   []model.Advertise
+		want   []model.SlowestQuery
 	}{
 		{
 			name:   "bad sorting query param",
@@ -81,27 +76,27 @@ func TestGetAll(t *testing.T) {
 			page: "1",
 			sort: "asc",
 			serviceMock: &serviceMockData{
-				page: 1,
-				sort: "asc",
-				ads:  []model.Advertise{advertise, anotherAdvertise},
+				page:    1,
+				sort:    "asc",
+				queries: []model.SlowestQuery{slowQuery, slowestQuery},
 			},
 			status: http.StatusOK,
-			want:   []model.Advertise{advertise, anotherAdvertise},
+			want:   []model.SlowestQuery{slowQuery, slowestQuery},
 		},
 	}
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockSvc := mocks.NewMockadvertiseService(ctl)
+			mockSvc := mocks.NewMockqueryService(ctl)
 
 			if tc.serviceMock != nil {
 				mockSvc.EXPECT().
 					GetAll(gomock.Any(), tc.serviceMock.page, tc.serviceMock.sort).
-					Return(tc.serviceMock.ads, tc.serviceMock.err).
+					Return(tc.serviceMock.queries, tc.serviceMock.err).
 					Times(1)
 			}
 			app := fiber.New()
-			handler := newAdvertiseHandler(mockSvc)
+			handler := newQueryHandler(mockSvc)
 			app.Get("/", handler.getAll)
 
 			target := "/"
@@ -117,11 +112,11 @@ func TestGetAll(t *testing.T) {
 			require.Equal(t, tc.status, resp.StatusCode)
 			require.NoError(t, err)
 			if tc.want != nil {
-				var ads []model.Advertise
-				err = json.NewDecoder(resp.Body).Decode(&ads)
+				var queries []model.SlowestQuery
+				err = json.NewDecoder(resp.Body).Decode(&queries)
 				require.NoError(t, err)
 				require.NotNil(t, resp)
-				require.Equal(t, tc.want, ads)
+				require.Equal(t, tc.want, queries)
 			}
 		})
 	}
@@ -130,7 +125,7 @@ func TestGet(t *testing.T) {
 	type serviceMockData struct {
 		id int
 
-		ad  *model.Advertise
+		ad  *model.SlowestQuery
 		err error
 	}
 	testsCases := []struct {
@@ -139,7 +134,7 @@ func TestGet(t *testing.T) {
 		serviceMock *serviceMockData
 
 		status int
-		want   *model.Advertise
+		want   *model.SlowestQuery
 	}{
 		{
 			name: "storage error",
@@ -165,16 +160,16 @@ func TestGet(t *testing.T) {
 			serviceMock: &serviceMockData{
 				id: 1,
 
-				ad: &advertise,
+				ad: &slowQuery,
 			},
 			status: http.StatusOK,
-			want:   &advertise,
+			want:   &slowQuery,
 		},
 	}
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockSvc := mocks.NewMockadvertiseService(ctl)
+			mockSvc := mocks.NewMockqueryService(ctl)
 
 			if tc.serviceMock != nil {
 				mockSvc.EXPECT().
@@ -183,7 +178,7 @@ func TestGet(t *testing.T) {
 					Times(1)
 			}
 			app := fiber.New()
-			handler := newAdvertiseHandler(mockSvc)
+			handler := newQueryHandler(mockSvc)
 			app.Get("/:id", handler.get)
 
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%d", tc.id), nil)
@@ -194,7 +189,7 @@ func TestGet(t *testing.T) {
 			require.Equal(t, tc.status, resp.StatusCode)
 			require.NoError(t, err)
 			if tc.want != nil {
-				var ad model.Advertise
+				var ad model.SlowestQuery
 				err = json.NewDecoder(resp.Body).Decode(&ad)
 				require.NoError(t, err)
 				require.NotNil(t, resp)
@@ -207,38 +202,38 @@ func TestGet(t *testing.T) {
 func TestCreate(t *testing.T) {
 	model.RegisterValidators()
 	type serviceMockData struct {
-		ad model.Advertise
+		ad model.SlowestQuery
 
 		err error
 	}
 	testsCases := []struct {
 		name        string
-		ad          model.Advertise
+		ad          model.SlowestQuery
 		serviceMock *serviceMockData
 
 		status int
 	}{
 		{
 			name: "storage error",
-			ad:   advertise,
+			ad:   slowQuery,
 			serviceMock: &serviceMockData{
-				ad:  advertise,
+				ad:  slowQuery,
 				err: model.ErrStorage,
 			},
 			status: http.StatusInternalServerError,
 		},
 		{
-			name: "bad advertise object",
-			ad: model.Advertise{
-				City: "Berlin",
+			name: "bad query object",
+			ad: model.SlowestQuery{
+				Query: "SELECT * FROM users",
 			},
 			status: http.StatusBadRequest,
 		},
 		{
 			name: "success",
-			ad:   advertise,
+			ad:   slowQuery,
 			serviceMock: &serviceMockData{
-				ad: advertise,
+				ad: slowQuery,
 			},
 			status: http.StatusCreated,
 		},
@@ -246,7 +241,7 @@ func TestCreate(t *testing.T) {
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockSvc := mocks.NewMockadvertiseService(ctl)
+			mockSvc := mocks.NewMockqueryService(ctl)
 
 			if tc.serviceMock != nil {
 				mockSvc.EXPECT().
@@ -255,7 +250,7 @@ func TestCreate(t *testing.T) {
 					Times(1)
 			}
 			app := fiber.New()
-			handler := newAdvertiseHandler(mockSvc)
+			handler := newQueryHandler(mockSvc)
 			app.Post("/", handler.create)
 			body, err := json.Marshal(tc.ad)
 			require.NoError(t, err)
@@ -273,14 +268,14 @@ func TestCreate(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	type serviceMockData struct {
-		ad model.Advertise
+		ad model.SlowestQuery
 
 		err error
 	}
 	testsCases := []struct {
 		name        string
 		id          int
-		ad          model.Advertise
+		ad          model.SlowestQuery
 		serviceMock *serviceMockData
 
 		status int
@@ -302,9 +297,9 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "success",
 			id:   1,
-			ad:   advertise,
+			ad:   slowQuery,
 			serviceMock: &serviceMockData{
-				ad: advertise,
+				ad: slowQuery,
 			},
 			status: http.StatusNoContent,
 		},
@@ -312,7 +307,7 @@ func TestUpdate(t *testing.T) {
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockSvc := mocks.NewMockadvertiseService(ctl)
+			mockSvc := mocks.NewMockqueryService(ctl)
 
 			if tc.serviceMock != nil {
 				mockSvc.EXPECT().
@@ -321,7 +316,7 @@ func TestUpdate(t *testing.T) {
 					Times(1)
 			}
 			app := fiber.New()
-			handler := newAdvertiseHandler(mockSvc)
+			handler := newQueryHandler(mockSvc)
 			app.Put("/:id", handler.update)
 			body, err := json.Marshal(tc.ad)
 			require.NoError(t, err)
@@ -380,7 +375,7 @@ func TestDelete(t *testing.T) {
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
-			mockSvc := mocks.NewMockadvertiseService(ctl)
+			mockSvc := mocks.NewMockqueryService(ctl)
 
 			if tc.serviceMock != nil {
 				mockSvc.EXPECT().
@@ -389,7 +384,7 @@ func TestDelete(t *testing.T) {
 					Times(1)
 			}
 			app := fiber.New()
-			handler := newAdvertiseHandler(mockSvc)
+			handler := newQueryHandler(mockSvc)
 			app.Delete("/:id", handler.delete)
 
 			req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/%d", tc.id), nil)

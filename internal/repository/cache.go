@@ -35,7 +35,8 @@ func NewCache(client *redis.Client, options ...Option) cache {
 	return c
 }
 
-func (c cache) Get(ctx context.Context, id string) (*model.Advertise, error) {
+// Get gets query to the cache
+func (c cache) Get(ctx context.Context, id string) (*model.SlowestQuery, error) {
 	cmd := c.client.Get(ctx, id)
 
 	cmdb, err := cmd.Bytes()
@@ -44,22 +45,23 @@ func (c cache) Get(ctx context.Context, id string) (*model.Advertise, error) {
 	}
 
 	b := bytes.NewReader(cmdb)
-	var ad model.Advertise
-	if err = gob.NewDecoder(b).Decode(&ad); err != nil {
+	var query model.SlowestQuery
+	if err = gob.NewDecoder(b).Decode(&query); err != nil {
 		return nil, err
 	}
 
-	return &ad, nil
+	return &query, nil
 }
 
-func (c cache) Set(ctx context.Context, ad model.Advertise) error {
+// Set saves query to the cache
+func (c cache) Set(ctx context.Context, query *model.SlowestQuery) error {
 	var b bytes.Buffer
 
-	if err := gob.NewEncoder(&b).Encode(ad); err != nil {
+	if err := gob.NewEncoder(&b).Encode(query); err != nil {
 		return err
 	}
 
-	return c.client.Set(ctx, strconv.Itoa(int(ad.ID)), b.Bytes(), c.exp).Err()
+	return c.client.Set(ctx, strconv.Itoa(int(query.ID)), b.Bytes(), c.exp).Err()
 }
 
 func WithExpiration(exp time.Duration) Option {

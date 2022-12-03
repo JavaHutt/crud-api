@@ -2,26 +2,21 @@ package model
 
 import (
 	"testing"
+	"time"
 )
 
 const (
-	name     = "banner"
-	provider = "outbrain"
-	country  = "Switzerland"
-	city     = "Bern"
-	street   = "Kramgasse"
+	query = "SELECT * FROM users"
+	spent = int(5 * time.Second)
 )
 
-func TestValidateAdvertise(t *testing.T) {
+func TestValidateSlowestQuery(t *testing.T) {
 	RegisterValidators()
 	type fields struct {
-		ID       int64
-		Name     string
-		Kind     AdvertiseKind
-		Provider string
-		Country  string
-		City     string
-		Street   string
+		ID        int64
+		Query     string
+		Statement QueryStatement
+		Timespent int
 	}
 	tests := []struct {
 		name    string
@@ -33,118 +28,57 @@ func TestValidateAdvertise(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "no name",
+			name: "no query",
 			fields: fields{
-				Kind:     AdvertiseKindBannerStretch,
-				Provider: provider,
-				Country:  country,
-				City:     city,
-				Street:   street,
+				Statement: QueryStatementInsert,
+				Timespent: int(5 * time.Second),
 			},
 			wantErr: true,
 		},
 		{
-			name: "no kind",
+			name: "no statement",
 			fields: fields{
-				Name:     name,
-				Provider: provider,
-				Country:  country,
-				City:     city,
-				Street:   street,
+				Query:     query,
+				Timespent: spent,
 			},
 			wantErr: true,
 		},
 		{
-			name: "unknown kind",
+			name: "unknown statement",
 			fields: fields{
-				Name:     name,
-				Kind:     "prebid",
-				Provider: provider,
-				Country:  country,
-				City:     city,
-				Street:   street,
+				Query:     query,
+				Statement: "upsert",
+				Timespent: spent,
 			},
 			wantErr: true,
 		},
 		{
-			name: "no provider",
+			name: "no time spent",
 			fields: fields{
-				Name:    name,
-				Kind:    AdvertiseKindAeroman,
-				Country: country,
-				City:    city,
-				Street:  street,
+				Query:     query,
+				Statement: QueryStatementDelete,
 			},
 			wantErr: true,
-		},
-		{
-			name: "no country",
-			fields: fields{
-				Name:     name,
-				Kind:     AdvertiseKindAeroman,
-				Provider: provider,
-				City:     city,
-				Street:   street,
-			},
-			wantErr: true,
-		},
-		{
-			name: "no city",
-			fields: fields{
-				Name:     name,
-				Kind:     AdvertiseKindAeroman,
-				Provider: provider,
-				Country:  country,
-				Street:   street,
-			},
-			wantErr: true,
-		},
-		{
-			name: "no street",
-			fields: fields{
-				Name:     name,
-				Kind:     AdvertiseKindAeroman,
-				Provider: provider,
-				Country:  country,
-				City:     city,
-			},
-			wantErr: true,
-		},
-		{
-			name: "no street with transition kind",
-			fields: fields{
-				Name:     name,
-				Kind:     AdvertiseKindTransition,
-				Provider: provider,
-				Country:  country,
-				City:     city,
-			},
 		},
 		{
 			name: "success",
 			fields: fields{
-				Name:     name,
-				Kind:     AdvertiseKindAeroman,
-				Provider: provider,
-				Country:  country,
-				City:     city,
-				Street:   street,
+				Query:     query,
+				Statement: QueryStatementDelete,
+				Timespent: spent,
 			},
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			a := Advertise{
-				ID:       tc.fields.ID,
-				Name:     tc.fields.Name,
-				Kind:     tc.fields.Kind,
-				Provider: tc.fields.Provider,
-				Country:  tc.fields.Country,
-				City:     tc.fields.City,
-				Street:   tc.fields.Street,
+			a := SlowestQuery{
+				ID:        tc.fields.ID,
+				Query:     tc.fields.Query,
+				Statement: tc.fields.Statement,
+				TimeSpent: tc.fields.Timespent,
 			}
 			if err := Validate.Struct(a); (err != nil) != tc.wantErr {
-				t.Errorf("Advertise.Validate() error = %v, wantErr %v", err, tc.wantErr)
+				t.Errorf("SlowestQuery.Validate() error = %v, wantErr %v", err, tc.wantErr)
 			}
 		})
 	}

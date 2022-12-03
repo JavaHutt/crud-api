@@ -31,7 +31,7 @@ func migrateTables(ctx context.Context, migrator *migrate.Migrator) error {
 		return err
 	}
 	if group.IsZero() {
-		fmt.Printf("there are no new migrations to run (database is up to date)\n")
+		fmt.Println("there are no new migrations to run (database is up to date)")
 		return nil
 	}
 	fmt.Printf("migrated to %s\n", group)

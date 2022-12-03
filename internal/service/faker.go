@@ -9,21 +9,12 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 )
 
-var adKinds = []model.AdvertiseKind{
-	model.AdvertiseKindBillboard,
-	model.AdvertiseKindCitylight,
-	model.AdvertiseKindStander,
-	model.AdvertiseKindLightbox,
-	model.AdvertiseKindBannerStretch,
-	model.AdvertiseKindPillar,
-	model.AdvertiseKindTransition,
-	model.AdvertiseKindSignboard,
-	model.AdvertiseKindAeroman,
-	model.AdvertiseKindNeon,
+var statementKinds = []model.QueryStatement{
+	model.QueryStatementSelect,
+	model.QueryStatementInsert,
+	model.QueryStatementUpdate,
+	model.QueryStatementDelete,
 }
-
-var providers = []string{"adblock", "outbrain", "plista", "affiliate", "appnext", "bizzclick", "mcn",
-	"mobupps", "nativex", "plista", "smartyads", "strossle"}
 
 type fakerService struct{}
 
@@ -32,11 +23,11 @@ func NewFakerService() fakerService {
 	return fakerService{}
 }
 
-// Fake generates random advertise objects, where num is the number of objects
-func (svc fakerService) Fake(num int) []model.Advertise {
+// Fake generates random query objects, where num is the number of objects
+func (svc fakerService) Fake(num int) []model.SlowestQuery {
 	faker := gofakeit.New(0)
 	now := time.Now().UTC()
-	ads := make([]model.Advertise, 0, num)
+	queries := make([]model.SlowestQuery, 0, num)
 	var mtx sync.Mutex
 	var wg sync.WaitGroup
 
@@ -46,35 +37,24 @@ func (svc fakerService) Fake(num int) []model.Advertise {
 			defer wg.Done()
 			mtx.Lock()
 			defer mtx.Unlock()
-			ads = append(ads, generateAdvertise(faker, now))
+			queries = append(queries, generateQuery(faker, now))
 		}()
 	}
 	wg.Wait()
-	return ads
+	return queries
 }
 
-func generateAdvertise(faker *gofakeit.Faker, now time.Time) model.Advertise {
-	kind := generateAdvertiseKind(faker)
-	var street string
-	if kind != model.AdvertiseKindTransition {
-		street = faker.Street()
-	}
-	return model.Advertise{
-		Name:      faker.Noun(),
-		Kind:      kind,
-		Provider:  generateProvider(faker),
-		Country:   faker.Country(),
-		City:      faker.City(),
-		Street:    street,
+func generateQuery(faker *gofakeit.Faker, now time.Time) model.SlowestQuery {
+	statement := generateStatementKind(faker)
+	return model.SlowestQuery{
+		Query:     faker.Sentence(faker.IntRange(4, 50)),
+		Statement: statement,
+		TimeSpent: faker.IntRange(1, 1000),
 		CreatedAt: faker.DateRange(now.AddDate(-3, 0, 0), now.AddDate(-1, 0, 0)),
 		UpdatedAt: faker.DateRange(now.AddDate(-1, 0, 0), now),
 	}
 }
 
-func generateAdvertiseKind(faker *gofakeit.Faker) model.AdvertiseKind {
-	return adKinds[faker.Number(0, len(adKinds)-1)]
-}
-
-func generateProvider(faker *gofakeit.Faker) string {
-	return providers[faker.Number(0, len(providers)-1)]
+func generateStatementKind(faker *gofakeit.Faker) model.QueryStatement {
+	return statementKinds[faker.Number(0, len(statementKinds)-1)]
 }

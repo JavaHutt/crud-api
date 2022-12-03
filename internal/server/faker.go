@@ -11,44 +11,47 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-const defaultNum = 100
+const (
+	numQuery   = "num"
+	defaultNum = 100
+)
 
 type fakerService interface {
-	Fake(num int) []model.Advertise
+	Fake(num int) []model.SlowestQuery
 }
 
-type adsService interface {
-	InsertBulk(ctx context.Context, ads []model.Advertise) error
+type querService interface {
+	InsertBulk(ctx context.Context, queries []model.SlowestQuery) error
 }
 
 type fakerHandler struct {
-	svc   fakerService
-	adSvc adsService
+	svc  fakerService
+	qSvc querService
 }
 
-func newFakerHandler(svc fakerService, adSvc adsService) fakerHandler {
+func newFakerHandler(svc fakerService, qSvc querService) fakerHandler {
 	return fakerHandler{
-		svc:   svc,
-		adSvc: adSvc,
+		svc:  svc,
+		qSvc: qSvc,
 	}
 }
 
 func (h fakerHandler) Routes(router fiber.Router) {
-	router.Get("/", h.fake)
+	router.Get("/", h.faker)
 }
 
-// fake godoc
-// @Summary Fake Advertise entities
+// faker godoc
+// @Summary Fake Query entities
 // @Tags    faker
-// @Param   num query int false "number of ads to generate"
+// @Param   num query int false "number of queries to generate"
 // @success 200
-// @Router  /fake [get]
-func (h fakerHandler) fake(c *fiber.Ctx) error {
-	numQuery := c.Query("num", strconv.Itoa(defaultNum))
-	num, err := strconv.Atoi(numQuery)
+// @Router  /faker [get]
+func (h fakerHandler) faker(c *fiber.Ctx) error {
+	numStr := c.Query(numQuery, strconv.Itoa(defaultNum))
+	num, err := strconv.Atoi(numStr)
 	if err != nil {
-		return badRequest(fmt.Sprintf("invalid number query param: %s", numQuery))
+		return badRequest(fmt.Sprintf("invalid number query param: %s", numStr))
 	}
-	ads := h.svc.Fake(num)
-	return h.adSvc.InsertBulk(c.Context(), ads)
+	queries := h.svc.Fake(num)
+	return h.qSvc.InsertBulk(c.Context(), queries)
 }

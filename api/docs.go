@@ -16,15 +16,15 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/advertise": {
+        "/api/v1/query": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "advertise"
+                    "query"
                 ],
-                "summary": "Get single Advertise entity",
+                "summary": "Get single query entity",
                 "parameters": [
                     {
                         "type": "integer",
@@ -38,7 +38,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Advertise"
+                            "$ref": "#/definitions/model.SlowestQuery"
                         }
                     },
                     "500": {
@@ -48,13 +48,13 @@ const docTemplate = `{
             },
             "put": {
                 "tags": [
-                    "advertise"
+                    "query"
                 ],
-                "summary": "Update single Advertise entity",
+                "summary": "Update single query entity",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "id of the ad",
+                        "description": "id of the query",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -74,9 +74,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "advertise"
+                    "query"
                 ],
-                "summary": "Creates a single Advertise entity",
+                "summary": "Creates a single Query entity",
                 "responses": {
                     "201": {
                         "description": "Created"
@@ -88,13 +88,13 @@ const docTemplate = `{
             },
             "delete": {
                 "tags": [
-                    "advertise"
+                    "query"
                 ],
-                "summary": "Delete single Advertise entity",
+                "summary": "Delete single query entity",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "id of the ad",
+                        "description": "id of the query",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -110,16 +110,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/fake": {
+        "/faker": {
             "get": {
                 "tags": [
                     "faker"
                 ],
-                "summary": "Fake Advertise entities",
+                "summary": "Fake Query entities",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "number of ads to generate",
+                        "description": "number of queries to generate",
                         "name": "num",
                         "in": "query"
                     }
@@ -133,39 +133,28 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "model.Advertise": {
+        "model.SlowestQuery": {
             "type": "object",
             "required": [
-                "city",
-                "country",
-                "kind",
-                "name",
-                "provider"
+                "query",
+                "statement",
+                "time_spent"
             ],
             "properties": {
-                "city": {
-                    "type": "string"
-                },
-                "country": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "kind": {
+                "query": {
                     "type": "string"
                 },
-                "name": {
+                "statement": {
                     "type": "string"
                 },
-                "provider": {
-                    "type": "string"
-                },
-                "street": {
-                    "type": "string"
+                "time_spent": {
+                    "type": "integer"
                 },
                 "updated_at": {
                     "type": "string"

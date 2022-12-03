@@ -36,10 +36,10 @@ func (m *MockfakerService) EXPECT() *MockfakerServiceMockRecorder {
 }
 
 // Fake mocks base method.
-func (m *MockfakerService) Fake(num int) []model.Advertise {
+func (m *MockfakerService) Fake(num int) []model.SlowestQuery {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Fake", num)
-	ret0, _ := ret[0].([]model.Advertise)
+	ret0, _ := ret[0].([]model.SlowestQuery)
 	return ret0
 }
 
@@ -49,39 +49,39 @@ func (mr *MockfakerServiceMockRecorder) Fake(num interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fake", reflect.TypeOf((*MockfakerService)(nil).Fake), num)
 }
 
-// MockadsService is a mock of adsService interface.
-type MockadsService struct {
+// MockquerService is a mock of querService interface.
+type MockquerService struct {
 	ctrl     *gomock.Controller
-	recorder *MockadsServiceMockRecorder
+	recorder *MockquerServiceMockRecorder
 }
 
-// MockadsServiceMockRecorder is the mock recorder for MockadsService.
-type MockadsServiceMockRecorder struct {
-	mock *MockadsService
+// MockquerServiceMockRecorder is the mock recorder for MockquerService.
+type MockquerServiceMockRecorder struct {
+	mock *MockquerService
 }
 
-// NewMockadsService creates a new mock instance.
-func NewMockadsService(ctrl *gomock.Controller) *MockadsService {
-	mock := &MockadsService{ctrl: ctrl}
-	mock.recorder = &MockadsServiceMockRecorder{mock}
+// NewMockquerService creates a new mock instance.
+func NewMockquerService(ctrl *gomock.Controller) *MockquerService {
+	mock := &MockquerService{ctrl: ctrl}
+	mock.recorder = &MockquerServiceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockadsService) EXPECT() *MockadsServiceMockRecorder {
+func (m *MockquerService) EXPECT() *MockquerServiceMockRecorder {
 	return m.recorder
 }
 
 // InsertBulk mocks base method.
-func (m *MockadsService) InsertBulk(ctx context.Context, ads []model.Advertise) error {
+func (m *MockquerService) InsertBulk(ctx context.Context, queries []model.SlowestQuery) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InsertBulk", ctx, ads)
+	ret := m.ctrl.Call(m, "InsertBulk", ctx, queries)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // InsertBulk indicates an expected call of InsertBulk.
-func (mr *MockadsServiceMockRecorder) InsertBulk(ctx, ads interface{}) *gomock.Call {
+func (mr *MockquerServiceMockRecorder) InsertBulk(ctx, queries interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertBulk", reflect.TypeOf((*MockadsService)(nil).InsertBulk), ctx, ads)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertBulk", reflect.TypeOf((*MockquerService)(nil).InsertBulk), ctx, queries)
 }

@@ -1,38 +1,30 @@
 definitions:
-  model.Advertise:
+  model.SlowestQuery:
     properties:
-      city:
-        type: string
-      country:
-        type: string
       created_at:
         type: string
       id:
         type: integer
-      kind:
+      query:
         type: string
-      name:
+      statement:
         type: string
-      provider:
-        type: string
-      street:
-        type: string
+      time_spent:
+        type: integer
       updated_at:
         type: string
     required:
-    - city
-    - country
-    - kind
-    - name
-    - provider
+    - query
+    - statement
+    - time_spent
     type: object
 info:
   contact: {}
 paths:
-  /api/v1/advertise:
+  /api/v1/query:
     delete:
       parameters:
-      - description: id of the ad
+      - description: id of the query
         in: path
         name: id
         required: true
@@ -42,9 +34,9 @@ paths:
           description: No Content
         "500":
           description: Internal Server Error
-      summary: Delete single Advertise entity
+      summary: Delete single query entity
       tags:
-      - advertise
+      - query
     get:
       parameters:
       - description: id of the ad
@@ -58,12 +50,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Advertise'
+            $ref: '#/definitions/model.SlowestQuery'
         "500":
           description: Internal Server Error
-      summary: Get single Advertise entity
+      summary: Get single query entity
       tags:
-      - advertise
+      - query
     post:
       consumes:
       - application/json
@@ -72,12 +64,12 @@ paths:
           description: Created
         "500":
           description: Internal Server Error
-      summary: Creates a single Advertise entity
+      summary: Creates a single Query entity
       tags:
-      - advertise
+      - query
     put:
       parameters:
-      - description: id of the ad
+      - description: id of the query
         in: path
         name: id
         required: true
@@ -87,20 +79,20 @@ paths:
           description: No Content
         "500":
           description: Internal Server Error
-      summary: Update single Advertise entity
+      summary: Update single query entity
       tags:
-      - advertise
-  /fake:
+      - query
+  /faker:
     get:
       parameters:
-      - description: number of ads to generate
+      - description: number of queries to generate
         in: query
         name: num
         type: integer
       responses:
         "200":
           description: OK
-      summary: Fake Advertise entities
+      summary: Fake Query entities
       tags:
       - faker
 swagger: "2.0"
