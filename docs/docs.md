@@ -28,3 +28,4 @@ The name of this file is `app.yaml`, the location is the `root directory`.
 | REDIS_DB                            | `0`                                | Redis database number |
 | CACHE_TIMEOUT                 | `100`                                           | Cache timeout in milliseconds
 | CACHE_EXPIRATION              | `25`                                          | Cache expiration time in seconds |
+| PAGINATION              | `10`                                          | Pagination size for repository |

@@ -37,9 +37,9 @@ make up
 ```
 You are ready to test the server!
 ```bash
-make start
+make run
 ```
-If you want to seed database with mock data, you can make specific request or use a following command:
+If you want to seed database with mock data, you can make specific HTTP request (see API DOCS [docs.md](./docs/docs.md)) or use a following command:
 ```bash
 make fake
 ```

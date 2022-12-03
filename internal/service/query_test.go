@@ -363,10 +363,16 @@ func TestDelete(t *testing.T) {
 
 		err error
 	}
+	type cacheDeleteMockData struct {
+		id string
+
+		err error
+	}
 	testsCases := []struct {
 		name           string
 		id             int
 		repositoryMock *repositoryMockData
+		cacheMock      *cacheDeleteMockData
 
 		err error
 	}{
@@ -383,19 +389,29 @@ func TestDelete(t *testing.T) {
 			repositoryMock: &repositoryMockData{
 				id: 1,
 			},
+			cacheMock: &cacheDeleteMockData{
+				id: "1",
+			},
 		},
 	}
 	for _, tc := range testsCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctl := gomock.NewController(t)
 			mockRepo := mocks.NewMockqueryRepository(ctl)
+			mockCache := mocks.NewMockcache(ctl)
 			if tc.repositoryMock != nil {
 				mockRepo.EXPECT().
 					Delete(context.Background(), tc.repositoryMock.id).
 					Return(tc.repositoryMock.err).
 					Times(1)
 			}
-			svc := NewQueryService(mockRepo, nil)
+			if tc.cacheMock != nil {
+				mockCache.EXPECT().
+					Delete(context.Background(), tc.cacheMock.id).
+					Return(tc.cacheMock.err).
+					Times(1)
+			}
+			svc := NewQueryService(mockRepo, mockCache)
 			err := svc.Delete(context.Background(), tc.id)
 
 			if tc.err != nil {

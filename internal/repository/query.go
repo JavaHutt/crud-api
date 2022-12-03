@@ -13,21 +13,32 @@ import (
 )
 
 const (
-	timeSpentColumn = "time_spent"
-	statementColumn = "statement"
-	createdAtColumn = "created_at"
-	perPage         = 10
+	timeSpentColumn   = "time_spent"
+	statementColumn   = "statement"
+	createdAtColumn   = "created_at"
+	defaultPagination = 10
 )
 
-type queriesRepo struct {
-	db *bun.DB
-}
+type (
+	RepoOption  func(rep *queriesRepo)
+	queriesRepo struct {
+		db         *bun.DB
+		pagination int
+	}
+)
 
 // NewQueryRepo is a constructor for queries repository
-func NewQueryRepo(db *bun.DB) queriesRepo {
-	return queriesRepo{
-		db: db,
+func NewQueryRepo(db *bun.DB, options ...RepoOption) queriesRepo {
+	rep := queriesRepo{
+		db:         db,
+		pagination: defaultPagination,
 	}
+
+	for _, opt := range options {
+		opt(&rep)
+	}
+
+	return rep
 }
 
 // GetAll selects all the queries
@@ -39,7 +50,7 @@ func (rep queriesRepo) GetAll(ctx context.Context, page int, sort string, statem
 
 	var queries []model.SlowestQuery
 	qb := rep.db.NewSelect().Model(&queries).OrderExpr(order).
-		Limit(perPage).Offset((page - 1) * perPage)
+		Limit(rep.pagination).Offset((page - 1) * rep.pagination)
 
 	if statement != "" {
 		qb.Where("? = ?", bun.Ident(statementColumn), statement)
@@ -97,4 +108,10 @@ func (rep queriesRepo) Delete(ctx context.Context, id int) error {
 		return err
 	}
 	return nil
+}
+
+func WithPagination(pagination int) RepoOption {
+	return func(rep *queriesRepo) {
+		rep.pagination = pagination
+	}
 }

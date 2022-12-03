@@ -144,6 +144,20 @@ func (m *Mockcache) EXPECT() *MockcacheMockRecorder {
 	return m.recorder
 }
 
+// Delete mocks base method.
+func (m *Mockcache) Delete(ctx context.Context, id string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockcacheMockRecorder) Delete(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*Mockcache)(nil).Delete), ctx, id)
+}
+
 // Get mocks base method.
 func (m *Mockcache) Get(ctx context.Context, id string) (*model.SlowestQuery, error) {
 	m.ctrl.T.Helper()

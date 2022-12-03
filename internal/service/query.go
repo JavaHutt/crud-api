@@ -21,6 +21,7 @@ type queryRepository interface {
 type cache interface {
 	Get(ctx context.Context, id string) (*model.SlowestQuery, error)
 	Set(ctx context.Context, query *model.SlowestQuery) error
+	Delete(ctx context.Context, id string) error
 }
 
 type queryService struct {
@@ -80,7 +81,7 @@ func (svc queryService) InsertBulk(ctx context.Context, queries []model.SlowestQ
 	return nil
 }
 
-// Update updates an query by it's ID
+// Update updates a query by it's ID
 func (svc queryService) Update(ctx context.Context, query model.SlowestQuery) error {
 	if err := svc.rep.Update(ctx, query); err != nil {
 		return fmt.Errorf("failed to update query: %w", err)
@@ -88,10 +89,13 @@ func (svc queryService) Update(ctx context.Context, query model.SlowestQuery) er
 	return nil
 }
 
-// Delete deletes an query row by it's ID
+// Delete deletes a query row by it's ID
 func (svc queryService) Delete(ctx context.Context, id int) error {
 	if err := svc.rep.Delete(ctx, id); err != nil {
 		return fmt.Errorf("failed to delete query: %w", err)
+	}
+	if err := svc.cache.Delete(ctx, strconv.Itoa(id)); err != nil {
+		fmt.Printf("failed to delete query from the cache: %s\n", err.Error())
 	}
 	return nil
 }

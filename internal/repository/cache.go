@@ -22,21 +22,21 @@ type (
 	}
 )
 
-func NewCache(client *redis.Client, options ...Option) cache {
-	c := cache{
+func NewCache(client *redis.Client, options ...Option) *cache {
+	c := &cache{
 		client: client,
 		exp:    defaultExpiration,
 	}
 
 	for _, opt := range options {
-		opt(&c)
+		opt(c)
 	}
 
 	return c
 }
 
 // Get gets query to the cache
-func (c cache) Get(ctx context.Context, id string) (*model.SlowestQuery, error) {
+func (c *cache) Get(ctx context.Context, id string) (*model.SlowestQuery, error) {
 	cmd := c.client.Get(ctx, id)
 
 	cmdb, err := cmd.Bytes()
@@ -54,7 +54,7 @@ func (c cache) Get(ctx context.Context, id string) (*model.SlowestQuery, error) 
 }
 
 // Set saves query to the cache
-func (c cache) Set(ctx context.Context, query *model.SlowestQuery) error {
+func (c *cache) Set(ctx context.Context, query *model.SlowestQuery) error {
 	var b bytes.Buffer
 
 	if err := gob.NewEncoder(&b).Encode(query); err != nil {
@@ -62,6 +62,10 @@ func (c cache) Set(ctx context.Context, query *model.SlowestQuery) error {
 	}
 
 	return c.client.Set(ctx, strconv.Itoa(int(query.ID)), b.Bytes(), c.exp).Err()
+}
+
+func (c *cache) Delete(ctx context.Context, id string) error {
+	return c.client.Del(ctx, id).Err()
 }
 
 func WithExpiration(exp time.Duration) Option {

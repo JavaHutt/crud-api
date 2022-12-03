@@ -12,7 +12,9 @@ const (
 	configFileType = "yaml"
 )
 
-type Config interface {
+var _ config = (*configData)(nil)
+
+type config interface {
 	AppName() string
 	APIAddress() string
 	IdleTimeout() time.Duration
@@ -28,6 +30,7 @@ type Config interface {
 	RedisDB() int
 	CacheTimeout() time.Duration
 	CacheExpiration() time.Duration
+	Pagination() int
 }
 
 //nolint:revive
@@ -47,9 +50,10 @@ type configData struct {
 	RedisDB_          int    `mapstructure:"REDIS_DB"`
 	CacheTimeout_     int    `mapstructure:"CACHE_TIMEOUT"`
 	CacheExpiration_  int    `mapstructure:"CACHE_EXPIRATION"`
+	Pagination_       int    `mapstructure:"PAGINATION"`
 }
 
-func New() (Config, error) {
+func New() (*configData, error) {
 	cfg, err := configureViper()
 	if err != nil {
 		return nil, err
@@ -88,6 +92,7 @@ func setDefaults() {
 	viper.SetDefault("REDIS_DB", 0)
 	viper.SetDefault("CACHE_TIMEOUT", 100)
 	viper.SetDefault("CACHE_EXPIRATION", 25)
+	viper.SetDefault("PAGINATION", 10)
 }
 
 func loadConfigToViper(path string) error {
@@ -155,4 +160,8 @@ func (cfg *configData) CacheTimeout() time.Duration {
 
 func (cfg *configData) CacheExpiration() time.Duration {
 	return time.Duration(cfg.CacheExpiration_) * time.Second
+}
+
+func (cfg *configData) Pagination() int {
+	return cfg.Pagination_
 }
